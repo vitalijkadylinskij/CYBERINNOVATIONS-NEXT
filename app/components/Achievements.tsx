@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
-import { ImageWithFallback } from './figma/ImageWithFallback';
 import { ArrowUpRight, MapPin, Users, Rocket, Server, Globe, Calendar } from 'lucide-react';
+import Image from "next/image";
 
 interface Achievement {
   title: string;
@@ -126,7 +126,9 @@ export function Achievements() {
             className="lg:col-span-8 lg:row-span-2 group"
           >
             <div className="relative h-full min-h-[520px] rounded-2xl overflow-hidden bg-white border border-[#151515]/10 shadow-sm">
-              <ImageWithFallback
+              <Image
+                width={100}
+                height={100}
                 src={achievements[0].image}
                 alt={achievements[0].title}
                 className="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:opacity-85 group-hover:scale-105 transition-all duration-700"
@@ -186,7 +188,9 @@ export function Achievements() {
               className="lg:col-span-4 group"
             >
               <div className="relative h-full min-h-[250px] rounded-2xl overflow-hidden bg-white border border-[#151515]/10 hover:border-[#151515]/20 hover:shadow-md transition-all">
-                <ImageWithFallback
+                <Image
+                  width={100}
+                  height={100}
                   src={item.image}
                   alt={item.title}
                   className="absolute inset-0 w-full h-full object-cover opacity-25 group-hover:opacity-35 transition-opacity duration-500"

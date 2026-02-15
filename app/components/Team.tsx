@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ImageWithFallback } from './figma/ImageWithFallback';
+import Image from "next/image";
 
 interface TeamMember {
   name: string;
@@ -13,26 +13,26 @@ const teamMembers: TeamMember[] = [
     name: 'ФИО — на утверждении',
     role: 'Председатель Ассоциации',
     description: 'Координация взаимодействия с государственными органами и развитие межотраслевого партнерства.',
-    image: '/materials/placeholders/expert-01.png',
+    image: "/materials/brandbook-media/image2.png",
   },
   {
     name: 'ФИО — на утверждении',
     role: 'Руководитель технологических подкомитетов',
     description:
       'Координация технологических подкомитетов: ИИ, блокчейн, IoT, кибербезопасность, микроэлектроника и робототехника, вычислительная инфраструктура, энергетика, подготовка кадров.',
-    image: '/materials/placeholders/expert-02.png',
+    image: "/materials/brandbook-media/image2.png",
   },
   {
     name: 'ФИО — на утверждении',
     role: 'Руководитель инвестиционного трека',
     description: 'Развитие программы партнерского финансирования и сопровождение инвестиционных инициатив.',
-    image: '/materials/placeholders/expert-03.png',
+    image: "/materials/brandbook-media/image2.png",
   },
   {
     name: 'ФИО — на утверждении',
     role: 'Руководитель образовательных и международных программ',
     description: 'Развитие кадрового резерва и международной повестки Ассоциации.',
-    image: '/materials/placeholders/expert-04.png',
+    image: "/materials/brandbook-media/image2.png",
   },
 ];
 
@@ -88,7 +88,9 @@ export function Team() {
             >
               <div className="relative rounded-2xl overflow-hidden bg-[#F3F4E9] border border-[#151515]/10 h-full">
                 <div className="relative aspect-[3/4] overflow-hidden">
-                  <ImageWithFallback
+                  <Image
+                    width={100}
+                    height={100}
                     src={member.image}
                     alt={member.role}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"

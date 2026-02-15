@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { motion } from "framer-motion";
 import { Building2, GraduationCap, Briefcase, Rocket, Users, Check } from 'lucide-react';
+import Image from 'next/image';
 
 interface AudienceGroup {
   icon: React.ElementType;
@@ -92,13 +93,13 @@ type Partner = { name: string; logo?: string };
 const partners: Partner[] = [
   { name: 'BRICS Pay', logo: '/materials/partners/brics-pay.svg' },
   { name: 'НЦОД', logo: '/materials/partners/ncod.svg' },
-  { name: 'СБХ', logo: '/materials/partners/sbh.svg'},
-  { name: 'АУРВА', logo: '/materials/partners/aurva.svg'},
-  { name: 'Бел. ТПП', logo: '/materials/partners/bel-tpp.svg'},
-  { name: 'ПЛАС', logo: '/materials/partners/plas.svg'},
-  { name: 'БелВЭБ', logo: '/materials/partners/belveb.svg'},
-  { name: 'ПВТ', logo: '/materials/partners/pvt.svg'},
-  { name: 'BYCLOUD', logo: '/materials/partners/bycloud.svg'},
+  { name: 'СБХ', logo: '/materials/partners/sbh.svg' },
+  { name: 'АУРВА', logo: '/materials/partners/aurva.svg' },
+  { name: 'Бел. ТПП', logo: '/materials/partners/bel-tpp.svg' },
+  { name: 'ПЛАС', logo: '/materials/partners/plas.svg' },
+  { name: 'БелВЭБ', logo: '/materials/partners/belveb.svg' },
+  { name: 'ПВТ', logo: '/materials/partners/pvt.svg' },
+  { name: 'BYCLOUD', logo: '/materials/partners/bycloud.svg' },
 ];
 
 function PartnerChip({ name, logo }: Partner) {
@@ -107,7 +108,9 @@ function PartnerChip({ name, logo }: Partner) {
   return (
     <div className="flex-shrink-0 px-6 md:px-7 py-4 rounded-2xl border border-[#151515]/10 bg-white/70 backdrop-blur flex items-center justify-center min-w-[160px] md:min-w-[190px] h-16 md:h-[84px]">
       {logo && !errored ? (
-        <img
+        <Image
+          width={100}
+          height={100}
           src={logo}
           alt={name}
           className="max-h-10 md:max-h-12 max-w-[120px] md:max-w-[140px] object-contain opacity-80"
@@ -171,9 +174,8 @@ export function TargetAudience() {
                   key={item.title}
                   type="button"
                   onClick={() => setActiveIndex(idx)}
-                  className={`rounded-2xl bg-white border px-4 py-3 text-left transition-colors ${
-                    idx === activeIndex ? 'border-[#5F891D]/35' : 'border-[#151515]/10'
-                  }`}
+                  className={`rounded-2xl bg-white border px-4 py-3 text-left transition-colors ${idx === activeIndex ? 'border-[#5F891D]/35' : 'border-[#151515]/10'
+                    }`}
                 >
                   <p className="text-sm font-semibold text-[#151515]">{item.shortLabel}</p>
                   <p className="text-xs text-[#151515]/55">{item.subtitle}</p>
@@ -189,9 +191,8 @@ export function TargetAudience() {
                     onMouseEnter={() => setActiveIndex(index)}
                     onFocus={() => setActiveIndex(index)}
                     onClick={() => setActiveIndex(index)}
-                    className={`relative group w-full rounded-2xl bg-white/90 border px-4 py-3 shadow-sm transition-all ${
-                      activeIndex === index ? 'border-[#5F891D]/35 shadow-md' : 'border-[#151515]/10 hover:shadow-md'
-                    }`}
+                    className={`relative group w-full rounded-2xl bg-white/90 border px-4 py-3 shadow-sm transition-all ${activeIndex === index ? 'border-[#5F891D]/35 shadow-md' : 'border-[#151515]/10 hover:shadow-md'
+                      }`}
                   >
                     <p className="text-sm font-semibold text-[#151515] text-center">{item.shortLabel}</p>
                     <p className="text-[11px] text-center mt-1" style={{ color: item.color }}>

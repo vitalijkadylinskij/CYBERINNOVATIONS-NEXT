@@ -13,7 +13,7 @@ import {
   Cloud,
   Zap,
 } from 'lucide-react';
-import { ImageWithFallback } from './figma/ImageWithFallback';
+import Image from "next/image";
 import type { CommitteeKey } from './TechnologyDirections';
 
 const keyPoints = [
@@ -39,56 +39,56 @@ const committeeMeta: Record<
     badge: "AI & ML",
     icon: Brain,
     accent: "#5F68A5",
-    image: "/materials/hero/ai.jpg",
+    image: "/materials/brandbook-media/image2.png",
   },
   blockchain: {
     title: "Распределённые реестры",
     badge: "Blockchain",
     icon: Link,
     accent: "#5F891D",
-    image: "/materials/hero/blockchain.jpg",
+    image: "/materials/brandbook-media/image2.png",
   },
   iot: {
     title: "Интернет вещей",
     badge: "IoT",
     icon: Radio,
     accent: "#5F891D",
-    image: "/materials/hero/iot.jpg",
+    image: "/materials/brandbook-media/image2.png",
   },
   cybersecurity: {
     title: "Кибербезопасность",
     badge: "Cybersecurity",
     icon: Shield,
     accent: "#5F68A5",
-    image: "/materials/hero/cybersecurity.jpg",
+    image: "/materials/brandbook-media/image2.png",
   },
   microelectronics: {
     title: "Микроэлектроника",
     badge: "Robotics",
     icon: Cpu,
     accent: "#5F68A5",
-    image: "/materials/hero/microelectronics.jpg",
+    image: "/materials/brandbook-media/image2.png",
   },
   cloud: {
     title: "Вычислительная инфраструктура",
     badge: "Cloud",
     icon: Cloud,
     accent: "#5F891D",
-    image: "/materials/hero/cloud.jpg",
+    image: "/materials/brandbook-media/image2.png",
   },
   energy: {
     title: "Энергетическая инфраструктура",
     badge: "Energy",
     icon: Zap,
     accent: "#5F891D",
-    image: "/materials/hero/energy.jpg",
+    image: "/materials/brandbook-media/image2.png",
   },
   "human-capital": {
     title: "Подготовка кадров",
     badge: "Human Capital",
     icon: Users,
     accent: "#5F68A5",
-    image: "/materials/hero/human-capital.jpg",
+    image: "/materials/brandbook-media/image2.png",
   },
 };
 
@@ -107,7 +107,9 @@ export function Hero({ activeCommittee = 'ai' }: HeroProps) {
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden" id="about">
       <div className="absolute inset-0">
-        <ImageWithFallback
+        <Image
+          width={100}
+          height={100}
           src={heroImage}
           alt="Технологический фон Ассоциации"
           className="w-full h-full object-cover"
@@ -211,7 +213,9 @@ export function Hero({ activeCommittee = 'ai' }: HeroProps) {
           >
             <div className="relative rounded-3xl overflow-hidden border border-white/10 bg-white/5 backdrop-blur-sm shadow-[0_20px_80px_rgba(0,0,0,0.35)]">
               <div className="relative aspect-[16/10]">
-                <ImageWithFallback
+                <Image
+                  width={100}
+                  height={100}
                   src={current.image}
                   alt={current.title}
                   className="absolute inset-0 w-full h-full object-cover"

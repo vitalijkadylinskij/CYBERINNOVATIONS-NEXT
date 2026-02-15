@@ -40,7 +40,7 @@ const documents: Document[] = [
     description: 'Цели, направления, приоритеты и форматы взаимодействия',
     icon: FileText,
     size: '2.3 MB',
-    href: '/materials/assosiation-3.pdf',
+    href: 'materials/assosiation-3.pdf',
     available: true,
   },
   {
@@ -48,7 +48,7 @@ const documents: Document[] = [
     description: 'Фирменный стиль и правила использования материалов',
     icon: FileText,
     size: '24.9 MB',
-    href: '/materials/brandbook.pptx',
+    href: 'materials/brandbook.pptx',
     available: true,
   },
 ];

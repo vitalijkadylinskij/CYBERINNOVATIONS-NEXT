@@ -11,7 +11,7 @@ const nextConfig: NextConfig = {
   ...(isProd
     ? {
         basePath: `/${repoName}`,
-        assetPrefix: `/${repoName}`,
+        assetPrefix: `/${repoName}/`,
       }
     : {}),
 

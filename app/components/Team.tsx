@@ -13,26 +13,26 @@ const teamMembers: TeamMember[] = [
     name: 'ФИО — на утверждении',
     role: 'Председатель Ассоциации',
     description: 'Координация взаимодействия с государственными органами и развитие межотраслевого партнерства.',
-    image: "/materials/brandbook-media/image2.png",
+    image: "materials/brandbook-media/image2.png",
   },
   {
     name: 'ФИО — на утверждении',
     role: 'Руководитель технологических подкомитетов',
     description:
       'Координация технологических подкомитетов: ИИ, блокчейн, IoT, кибербезопасность, микроэлектроника и робототехника, вычислительная инфраструктура, энергетика, подготовка кадров.',
-    image: "/materials/brandbook-media/image2.png",
+    image: "materials/brandbook-media/image2.png",
   },
   {
     name: 'ФИО — на утверждении',
     role: 'Руководитель инвестиционного трека',
     description: 'Развитие программы партнерского финансирования и сопровождение инвестиционных инициатив.',
-    image: "/materials/brandbook-media/image2.png",
+    image: "materials/brandbook-media/image2.png",
   },
   {
     name: 'ФИО — на утверждении',
     role: 'Руководитель образовательных и международных программ',
     description: 'Развитие кадрового резерва и международной повестки Ассоциации.',
-    image: "/materials/brandbook-media/image2.png",
+    image: "materials/brandbook-media/image2.png",
   },
 ];
 

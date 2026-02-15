@@ -9,6 +9,10 @@ const bebas = Bebas_Neue({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    "https://vitalijkadylinskij.github.io/CYBERINNOVATIONS-NEXT"
+  ),
+
   title: {
     default: "Cyber Innovation — IT решения и цифровая трансформация",
     template: "%s | Cyber Innovation",
@@ -17,12 +21,9 @@ export const metadata: Metadata = {
   description:
     "Cyber Innovation — разработка IT решений, кибербезопасность и внедрение инновационных технологий для бизнеса.",
 
-  keywords: [
-    "IT решения",
-    "кибербезопасность",
-    "цифровая трансформация",
-    "разработка ПО",
-  ],
+  alternates: {
+    canonical: "/",
+  },
 
   openGraph: {
     title: "Cyber Innovation — IT решения нового поколения",
@@ -31,7 +32,7 @@ export const metadata: Metadata = {
     siteName: "Cyber Innovation",
     images: [
       {
-        url: "/logos/Logo-ACI-RUS.ver2.svg", // локальное изображение из public
+        url: "https://vitalijkadylinskij.github.io/CYBERINNOVATIONS-NEXT/materials/brandbook-media/image5.png",
         width: 1200,
         height: 630,
       },
@@ -51,10 +52,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${bebas.variable} antialiased`}
-      >
+    <html lang="ru">
+      <body className={`${bebas.variable} antialiased`}>
         {children}
       </body>
     </html>

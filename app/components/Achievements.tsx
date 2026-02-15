@@ -19,7 +19,7 @@ const achievements: Achievement[] = [
       'Совместно с государством, бизнесом и экспертами прорабатываем архитектуру, требования и модель доступа к вычислительной инфраструктуре для проектов национального масштаба.',
     date: '2025–2026',
     location: 'Минск, Республика Беларусь',
-    image: '/materials/brandbook-media/image26.png',
+    image: 'materials/brandbook-media/image26.png',
     participants: 'Профильные рабочие группы',
     highlight: 'Ключевой проект',
   },
@@ -29,7 +29,7 @@ const achievements: Achievement[] = [
       'Развиваем сеть национальных и международных партнёров для совместных проектов, пилотов и отраслевой кооперации.',
     date: 'Регулярно',
     location: 'Беларусь / Международные площадки',
-    image: '/materials/brandbook-media/image39.png',
+    image: 'materials/brandbook-media/image39.png',
   },
   {
     title: 'Круглые столы по нормативной и инвестиционной повестке',
@@ -37,7 +37,7 @@ const achievements: Achievement[] = [
       'Согласовываем приоритеты, требования и механики внедрения: государство, наука, инвесторы и технологические компании.',
     date: 'Ежеквартально',
     location: 'Минск, Республика Беларусь',
-    image: '/materials/brandbook-media/image40.png',
+    image: 'materials/brandbook-media/image40.png',
     participants: 'Эксперты и члены Ассоциации',
   },
 ];

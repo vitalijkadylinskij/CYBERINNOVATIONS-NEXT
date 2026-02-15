@@ -69,7 +69,7 @@ export function Header() {
               onClick={(e) => handleAnchorClick(e, "#about")}
             >
               <Image
-                src="/logos/Logo-ACI-RUS.ver1.svg"
+                src="logos/Logo-ACI-RUS.ver1.svg"
                 width={200}
                 height={100}
                 alt="Ассоциация Цифровых Технологий и Инноваций Кибер Инновации"

@@ -91,15 +91,15 @@ const orbitPositions = [
 type Partner = { name: string; logo?: string };
 
 const partners: Partner[] = [
-  { name: 'BRICS Pay', logo: '/materials/partners/brics-pay.svg' },
-  { name: 'НЦОД', logo: '/materials/partners/ncod.svg' },
-  { name: 'СБХ', logo: '/materials/partners/sbh.svg' },
-  { name: 'АУРВА', logo: '/materials/partners/aurva.svg' },
-  { name: 'Бел. ТПП', logo: '/materials/partners/bel-tpp.svg' },
-  { name: 'ПЛАС', logo: '/materials/partners/plas.svg' },
-  { name: 'БелВЭБ', logo: '/materials/partners/belveb.svg' },
-  { name: 'ПВТ', logo: '/materials/partners/pvt.svg' },
-  { name: 'BYCLOUD', logo: '/materials/partners/bycloud.svg' },
+  { name: 'BRICS Pay', logo: 'materials/partners/brics-pay.svg' },
+  { name: 'НЦОД', logo: 'materials/partners/ncod.svg' },
+  { name: 'СБХ', logo: 'materials/partners/sbh.svg' },
+  { name: 'АУРВА', logo: 'materials/partners/aurva.svg' },
+  { name: 'Бел. ТПП', logo: 'materials/partners/bel-tpp.svg' },
+  { name: 'ПЛАС', logo: 'materials/partners/plas.svg' },
+  { name: 'БелВЭБ', logo: 'materials/partners/belveb.svg' },
+  { name: 'ПВТ', logo: 'materials/partners/pvt.svg' },
+  { name: 'BYCLOUD', logo: 'materials/partners/bycloud.svg' },
 ];
 
 function PartnerChip({ name, logo }: Partner) {

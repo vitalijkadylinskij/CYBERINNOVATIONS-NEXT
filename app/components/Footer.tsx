@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Mail, Phone, MapPin, Send, ArrowUpRight } from 'lucide-react';
+import Image from "next/image";
 
 export function Footer() {
   const handleAnchorClick = (event: React.MouseEvent<HTMLAnchorElement>, href: string) => {
@@ -12,7 +13,7 @@ export function Footer() {
     window.scrollTo({ top: y, behavior: 'smooth' });
   };
   const currentYear = new Date().getFullYear();
-  const presentationPdf = '/materials/assosiation-3.pdf';
+  const presentationPdf = 'materials/assosiation-3.pdf';
 
   const navLinks = [
     { label: 'О нас', href: '#about' },
@@ -69,8 +70,10 @@ export function Footer() {
           <div className="grid md:grid-cols-2 lg:grid-cols-12 gap-12 mb-14">
             <div className="lg:col-span-4">
               <div className="flex items-center justify-center gap-3 mb-4">
-                <img
-                  src="/logos/Logo-ACI-RUS.ver1.svg"
+                <Image
+                  width={100}
+                  height={100}
+                  src="logos/Logo-ACI-RUS.ver1.svg"
                   alt="Кибер Инновации"
                   className="h-32 w-auto object-contain my-auto"
                   style={{ minHeight: '10rem' }}

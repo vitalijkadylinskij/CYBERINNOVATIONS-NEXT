@@ -343,7 +343,7 @@ export function TargetAudience() {
           </div>
 
           <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}>
-            <div className="text-center mb-8">
+            <div className="text-center my-8">
               <span className="text-sm text-[#151515]/40 tracking-[0.2em] uppercase">Партнёры и соглашения</span>
             </div>
 

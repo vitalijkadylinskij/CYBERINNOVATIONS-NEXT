@@ -1,5 +1,6 @@
+"use client";
 import { useMemo, useState, useEffect, useRef } from 'react';
-import { motion, useMotionValue, useTransform, animate } from "framer-motion";
+import { motion, useMotionValue, animate } from "framer-motion";
 import { Building2, GraduationCap, Briefcase, Rocket, Users, Check } from 'lucide-react';
 import Image from 'next/image';
 
@@ -105,22 +106,23 @@ function OrbitLabel({
 }) {
   const angle = useMotionValue(index * 72);
   const controlsRef = useRef<ReturnType<typeof animate> | null>(null);
-  const left = useTransform(angle, (a) => {
-    const rad = (a * Math.PI) / 180;
-    return `${50 + ORBIT_RADIUS_X * Math.cos(rad)}%`;
-  });
-  const top = useTransform(angle, (a) => {
-    const rad = (a * Math.PI) / 180;
-    return `${50 + ORBIT_RADIUS_Y * Math.sin(rad)}%`;
-  });
+
+  const [coords, setCoords] = useState<{ left: string; top: string } | null>(null);
 
   useEffect(() => {
+    const calcLeft = (a: number) => `${50 + ORBIT_RADIUS_X * Math.cos((a * Math.PI) / 180)}%`;
+    const calcTop = (a: number) => `${50 + ORBIT_RADIUS_Y * Math.sin((a * Math.PI) / 180)}%`;
+
+    setCoords({ left: calcLeft(index * 72), top: calcTop(index * 72) });
+
     controlsRef.current = animate(angle, 360 + index * 72, {
       duration: ORBIT_DURATION,
       repeat: Infinity,
       ease: 'linear',
       delay,
+      onUpdate: (a) => setCoords({ left: calcLeft(a), top: calcTop(a) }),
     });
+
     return () => {
       controlsRef.current?.stop();
       controlsRef.current = null;
@@ -129,18 +131,16 @@ function OrbitLabel({
 
   useEffect(() => {
     if (controlsRef.current) {
-      if (isPaused) {
-        controlsRef.current.pause();
-      } else {
-        controlsRef.current.play();
-      }
+      isPaused ? controlsRef.current.pause() : controlsRef.current.play();
     }
   }, [isPaused]);
+
+  if (!coords) return null;
 
   return (
     <motion.div
       className="absolute w-32 xl:w-40 pointer-events-auto -translate-x-1/2 -translate-y-1/2"
-      style={{ left, top }}
+      style={{ left: coords.left, top: coords.top }}
     >
       <button
         type="button"
@@ -209,6 +209,7 @@ export function TargetAudience() {
 
   const active = useMemo(() => audiences[activeIndex], [activeIndex]);
   const ActiveIcon = active.icon;
+
   return (
     <section className="py-24 relative overflow-hidden" id="audience">
       <div className="absolute inset-0 bg-white" />
@@ -218,12 +219,8 @@ export function TargetAudience() {
       <div className="absolute bottom-40 -left-40 w-80 h-80 rounded-full bg-[#5F891D]/5 blur-3xl" />
 
       <div className="container mx-auto px-4 relative z-10">
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="max-w-5xl mb-16"
-        >
+        {/* Заголовок */}
+        <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="max-w-5xl mb-16">
           <div className="flex items-center gap-3 mb-6">
             <div className="h-px w-12 bg-[#5F891D]" />
             <span className="text-[#5F891D] text-sm tracking-[0.2em] uppercase font-medium">Доверительное партнерство</span>
@@ -240,29 +237,20 @@ export function TargetAudience() {
           </p>
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 28 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="rounded-3xl border border-[#151515]/10 bg-[#F3F4E9]/65 p-6 md:p-10 mb-14"
-        >
+        {/* Орбита и центр */}
+        <motion.div initial={{ opacity: 0, y: 28 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="rounded-3xl border border-[#151515]/10 bg-[#F3F4E9]/65 p-6 md:p-10 mb-14">
           <div className="relative min-h-[420px] lg:min-h-[540px]">
-            {/* Mobile quick labels */}
+            {/* Мобильные кнопки */}
             <div className="grid gap-3 lg:hidden mb-8">
               {audiences.map((item, idx) => (
-                <button
-                  key={item.title}
-                  type="button"
-                  onClick={() => setActiveIndex(idx)}
-                  className={`rounded-2xl bg-white border px-4 py-3 text-left transition-colors ${idx === activeIndex ? 'border-[#5F891D]/35' : 'border-[#151515]/10'
-                    }`}
-                >
+                <button key={item.title} type="button" onClick={() => setActiveIndex(idx)} className={`rounded-2xl bg-white border px-4 py-3 text-left transition-colors ${idx === activeIndex ? 'border-[#5F891D]/35' : 'border-[#151515]/10'}`}>
                   <p className="text-sm font-semibold text-[#151515]">{item.shortLabel}</p>
                   <p className="text-xs text-[#151515]/55">{item.subtitle}</p>
                 </button>
               ))}
             </div>
 
+            {/* Орбита для десктопа */}
             <div className="hidden lg:flex absolute inset-0 items-center justify-center pointer-events-none">
               <div className="absolute inset-0 pointer-events-none">
                 <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden>
@@ -271,7 +259,6 @@ export function TargetAudience() {
                 </svg>
               </div>
 
-              {/* Orbiting labels — овальная траектория, лейблы без наклона */}
               <div className="absolute w-[95%] h-[95%] z-30" style={{ left: '2.5%', top: '2.5%' }}>
                 {audiences.map((item, index) => (
                   <OrbitLabel
@@ -289,32 +276,17 @@ export function TargetAudience() {
               </div>
             </div>
 
-            {/* Center */}
+            {/* Центр */}
             <div className="relative mt-4 lg:mt-0 lg:absolute lg:top-1/2 lg:left-1/2 lg:-translate-x-1/2 lg:-translate-y-1/2 w-full lg:w-[360px] z-10">
               <div className="relative rounded-3xl bg-white border border-[#151515]/10 p-6 md:p-8 text-center overflow-hidden shadow-sm">
-                <motion.div
-                  aria-hidden
-                  className="absolute -inset-24 rounded-full bg-gradient-to-r from-[#5F68A5]/12 via-[#5F891D]/10 to-transparent"
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
-                />
-                <motion.div
-                  aria-hidden
-                  className="absolute inset-0"
-                  animate={{ opacity: [0.35, 0.6, 0.35] }}
-                  transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}
-                >
+                <motion.div aria-hidden className="absolute -inset-24 rounded-full bg-gradient-to-r from-[#5F68A5]/12 via-[#5F891D]/10 to-transparent" animate={{ rotate: 360 }} transition={{ duration: 30, repeat: Infinity, ease: 'linear' }} />
+                <motion.div aria-hidden className="absolute inset-0" animate={{ opacity: [0.35, 0.6, 0.35] }} transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}>
                   <div className="absolute inset-6 rounded-3xl border border-[#151515]/10" />
                   <div className="absolute inset-10 rounded-3xl border border-[#151515]/10" />
                 </motion.div>
 
                 <div className="relative">
-                  <motion.div
-                    className="mx-auto w-14 h-14 rounded-2xl flex items-center justify-center mb-4"
-                    style={{ backgroundColor: `${active.color}14`, color: active.color }}
-                    animate={{ scale: [1, 1.04, 1] }}
-                    transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
-                  >
+                  <motion.div className="mx-auto w-14 h-14 rounded-2xl flex items-center justify-center mb-4" style={{ backgroundColor: `${active.color}14`, color: active.color }} animate={{ scale: [1, 1.04, 1] }} transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}>
                     <ActiveIcon className="w-7 h-7" />
                   </motion.div>
 
@@ -338,14 +310,11 @@ export function TargetAudience() {
             </div>
           </div>
 
-          {/* Hover/selection details (single source of truth, no duplication) */}
+          {/* Партнёры */}
           <div className="mt-10 grid lg:grid-cols-2 gap-6 items-start">
             <div className="rounded-2xl bg-white border border-[#151515]/10 p-6">
               <div className="flex items-start justify-between gap-4 mb-4">
-                <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center"
-                  style={{ backgroundColor: `${active.color}18`, color: active.color }}
-                >
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${active.color}18`, color: active.color }}>
                   <ActiveIcon className="w-6 h-6" />
                 </div>
                 <span className="text-xs font-medium tracking-[0.16em] uppercase" style={{ color: active.color }}>
@@ -372,32 +341,23 @@ export function TargetAudience() {
               </ul>
             </div>
           </div>
-        </motion.div>
 
+          <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}>
+            <div className="text-center mb-8">
+              <span className="text-sm text-[#151515]/40 tracking-[0.2em] uppercase">Партнёры и соглашения</span>
+            </div>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-        >
-          <div className="text-center mb-8">
-            <span className="text-sm text-[#151515]/40 tracking-[0.2em] uppercase">Партнёры и соглашения</span>
-          </div>
+            <div className="relative overflow-hidden py-4">
+              <div className="absolute left-0 top-0 bottom-0 w-24 md:w-40 bg-gradient-to-r from-white to-transparent z-10" />
+              <div className="absolute right-0 top-0 bottom-0 w-24 md:w-40 bg-gradient-to-l from-white to-transparent z-10" />
 
-          <div className="relative overflow-hidden py-4">
-            <div className="absolute left-0 top-0 bottom-0 w-24 md:w-40 bg-gradient-to-r from-white to-transparent z-10" />
-            <div className="absolute right-0 top-0 bottom-0 w-24 md:w-40 bg-gradient-to-l from-white to-transparent z-10" />
-
-            <motion.div
-              animate={{ x: ['0%', '-50%'] }}
-              transition={{ duration: 26, repeat: Infinity, ease: 'linear' }}
-              className="flex gap-4 md:gap-7 items-center"
-            >
-              {[...partners, ...partners].map((partner, index) => (
-                <PartnerChip key={`${partner.name}-${index}`} {...partner} />
-              ))}
-            </motion.div>
-          </div>
+              <motion.div animate={{ x: ['0%', '-50%'] }} transition={{ duration: 26, repeat: Infinity, ease: 'linear' }} className="flex gap-4 md:gap-7 items-center">
+                {[...partners, ...partners].map((partner, index) => (
+                  <PartnerChip key={`${partner.name}-${index}`} {...partner} />
+                ))}
+              </motion.div>
+            </div>
+          </motion.div>
         </motion.div>
       </div>
     </section>

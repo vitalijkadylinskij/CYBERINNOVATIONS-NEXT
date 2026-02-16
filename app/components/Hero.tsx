@@ -1,4 +1,7 @@
-import { motion } from "framer-motion";
+"use client";
+
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowDown,
   ArrowRight,
@@ -46,49 +49,49 @@ const committeeMeta: Record<
     badge: "Blockchain",
     icon: Link,
     accent: "#5F891D",
-    image: "materials/brandbook-media/image2.png",
+    image: "materials/brandbook-media/image5.png",
   },
   iot: {
     title: "Интернет вещей",
     badge: "IoT",
     icon: Radio,
     accent: "#5F891D",
-    image: "materials/brandbook-media/image2.png",
+    image: "materials/brandbook-media/image11.png",
   },
   cybersecurity: {
     title: "Кибербезопасность",
     badge: "Cybersecurity",
     icon: Shield,
     accent: "#5F68A5",
-    image: "materials/brandbook-media/image2.png",
+    image: "materials/brandbook-media/image23.png",
   },
   microelectronics: {
     title: "Микроэлектроника",
     badge: "Robotics",
     icon: Cpu,
     accent: "#5F68A5",
-    image: "materials/brandbook-media/image2.png",
+    image: "materials/brandbook-media/image26.png",
   },
   cloud: {
     title: "Вычислительная инфраструктура",
     badge: "Cloud",
     icon: Cloud,
     accent: "#5F891D",
-    image: "materials/brandbook-media/image2.png",
+    image: "materials/brandbook-media/image28.png",
   },
   energy: {
     title: "Энергетическая инфраструктура",
     badge: "Energy",
     icon: Zap,
     accent: "#5F891D",
-    image: "materials/brandbook-media/image2.png",
+    image: "materials/brandbook-media/image29.png",
   },
   "human-capital": {
     title: "Подготовка кадров",
     badge: "Human Capital",
     icon: Users,
     accent: "#5F68A5",
-    image: "materials/brandbook-media/image2.png",
+    image: "materials/brandbook-media/image31.png",
   },
 };
 
@@ -96,7 +99,20 @@ interface HeroProps {
   activeCommittee?: CommitteeKey;
 }
 
-export function Hero({ activeCommittee = 'ai' }: HeroProps) {
+const SLIDE_INTERVAL_MS = 5000;
+
+export function Hero({ activeCommittee: initialCommittee = 'ai' }: HeroProps) {
+  const [activeCommittee, setActiveCommittee] = useState<CommitteeKey>(initialCommittee);
+
+  useEffect(() => {
+    const idx = committeeOrder.indexOf(activeCommittee);
+    const nextIdx = (idx + 1) % committeeOrder.length;
+    const timer = setInterval(() => {
+      setActiveCommittee(committeeOrder[nextIdx]);
+    }, SLIDE_INTERVAL_MS);
+    return () => clearInterval(timer);
+  }, [activeCommittee]);
+
   const heroImage = "materials/brandbook-media/image40.png";
   const current = committeeMeta[activeCommittee];
   const nextKey = committeeOrder[(committeeOrder.indexOf(activeCommittee) + 1) % committeeOrder.length];
@@ -213,54 +229,92 @@ export function Hero({ activeCommittee = 'ai' }: HeroProps) {
           >
             <div className="relative rounded-3xl overflow-hidden border border-white/10 bg-white/5 backdrop-blur-sm shadow-[0_20px_80px_rgba(0,0,0,0.35)]">
               <div className="relative aspect-[16/10]">
-                <Image
-                  width={100}
-                  height={100}
-                  src={current.image}
-                  alt={current.title}
-                  className="absolute inset-0 w-full h-full object-cover"
-                />
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={activeCommittee}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.6 }}
+                    className="absolute inset-0"
+                  >
+                    <Image
+                      width={100}
+                      height={100}
+                      src={current.image}
+                      alt={current.title}
+                      className="w-full h-full object-cover"
+                    />
+                  </motion.div>
+                </AnimatePresence>
                 {/* fallback tint if assets not yet added */}
                 <div className="absolute inset-0 bg-gradient-to-tr from-[#0f1115]/55 via-transparent to-[#5F891D]/20" />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0f1115]/45 via-transparent to-transparent" />
 
                 {/* top-right badge (active committee) */}
-                <div className="absolute top-4 right-4">
-                  <div className="inline-flex items-center gap-3 px-4 py-2 rounded-2xl bg-[#0f1115]/65 border border-white/10 backdrop-blur">
-                    <div
-                      className="w-8 h-8 rounded-xl flex items-center justify-center"
-                      style={{ backgroundColor: `${current.accent}22`, color: current.accent }}
-                    >
-                      <CurrentIcon className="w-4.5 h-4.5" />
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={`current-${activeCommittee}`}
+                    initial={{ opacity: 0, x: 8 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -8 }}
+                    transition={{ duration: 0.5 }}
+                    className="absolute top-4 right-4"
+                  >
+                    <div className="inline-flex items-center gap-3 px-4 py-2 rounded-2xl bg-[#0f1115]/65 border border-white/10 backdrop-blur">
+                      <div
+                        className="w-8 h-8 rounded-xl flex items-center justify-center"
+                        style={{ backgroundColor: `${current.accent}22`, color: current.accent }}
+                      >
+                        <CurrentIcon className="w-4.5 h-4.5" />
+                      </div>
+                      <div className="leading-tight">
+                        <div className="text-xs font-semibold text-[#F3F4E9]">{current.badge}</div>
+                        <div className="text-[11px] text-[#F3F4E9]/60">{current.title}</div>
+                      </div>
                     </div>
-                    <div className="leading-tight">
-                      <div className="text-xs font-semibold text-[#F3F4E9]">{current.badge}</div>
-                      <div className="text-[11px] text-[#F3F4E9]/60">{current.title}</div>
-                    </div>
-                  </div>
-                </div>
+                  </motion.div>
+                </AnimatePresence>
 
                 {/* bottom-left badge (next committee hint) */}
-                <div className="absolute bottom-4 left-4">
-                  <div className="inline-flex items-center gap-3 px-4 py-2 rounded-2xl bg-[#0f1115]/55 border border-white/10 backdrop-blur">
-                    <div
-                      className="w-8 h-8 rounded-xl flex items-center justify-center"
-                      style={{ backgroundColor: `${next.accent}22`, color: next.accent }}
-                    >
-                      <NextIcon className="w-4.5 h-4.5" />
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={`next-${nextKey}`}
+                    initial={{ opacity: 0, x: -8 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 8 }}
+                    transition={{ duration: 0.5 }}
+                    className="absolute bottom-4 left-4"
+                  >
+                    <div className="inline-flex items-center gap-3 px-4 py-2 rounded-2xl bg-[#0f1115]/55 border border-white/10 backdrop-blur">
+                      <div
+                        className="w-8 h-8 rounded-xl flex items-center justify-center"
+                        style={{ backgroundColor: `${next.accent}22`, color: next.accent }}
+                      >
+                        <NextIcon className="w-4.5 h-4.5" />
+                      </div>
+                      <div className="leading-tight">
+                        <div className="text-xs font-semibold text-[#F3F4E9]">{next.badge}</div>
+                        <div className="text-[11px] text-[#F3F4E9]/60">{next.title}</div>
+                      </div>
                     </div>
-                    <div className="leading-tight">
-                      <div className="text-xs font-semibold text-[#F3F4E9]">{next.badge}</div>
-                      <div className="text-[11px] text-[#F3F4E9]/60">{next.title}</div>
-                    </div>
-                  </div>
-                </div>
+                  </motion.div>
+                </AnimatePresence>
               </div>
 
               <div className="px-6 py-5 flex items-center justify-between">
-                <div className="text-sm text-[#F3F4E9]/65">
-                  Активный комитет: <span className="text-[#F3F4E9] font-medium">{current.title}</span>
-                </div>
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={`footer-${activeCommittee}`}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.4 }}
+                    className="text-sm text-[#F3F4E9]/65"
+                  >
+                    Активный комитет: <span className="text-[#F3F4E9] font-medium">{current.title}</span>
+                  </motion.div>
+                </AnimatePresence>
                 <a
                   href="#directions"
                   className="text-sm font-medium text-[#F3F4E9] hover:text-[#F3F4E9]/80 transition-colors inline-flex items-center gap-2"

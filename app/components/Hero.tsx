@@ -224,26 +224,26 @@ export function Hero({ activeCommittee: initialCommittee = 'ai' }: HeroProps) {
           <motion.div
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15, duration: 0.7 }}
+            transition={{ delay: 0.15, duration: 1.2, ease: [0.4, 0, 0.2, 1] }}
             className="relative"
           >
             <div className="relative rounded-3xl overflow-hidden border border-white/10 bg-white/5 backdrop-blur-sm shadow-[0_20px_80px_rgba(0,0,0,0.35)]">
               <div className="relative aspect-[16/10]">
-                <AnimatePresence mode="wait">
+                <AnimatePresence>
                   <motion.div
                     key={activeCommittee}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    transition={{ duration: 0.6 }}
+                    transition={{ duration: 1.2, ease: [0.4, 0, 0.2, 1] }}
                     className="absolute inset-0"
                   >
                     <Image
-                      width={100}
-                      height={100}
+                      fill
                       src={current.image}
                       alt={current.title}
                       className="w-full h-full object-cover"
+                      priority
                     />
                   </motion.div>
                 </AnimatePresence>
@@ -252,13 +252,13 @@ export function Hero({ activeCommittee: initialCommittee = 'ai' }: HeroProps) {
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0f1115]/45 via-transparent to-transparent" />
 
                 {/* top-right badge (active committee) */}
-                <AnimatePresence mode="wait">
+                <AnimatePresence>
                   <motion.div
                     key={`current-${activeCommittee}`}
                     initial={{ opacity: 0, x: 8 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -8 }}
-                    transition={{ duration: 0.5 }}
+                    transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
                     className="absolute top-4 right-4"
                   >
                     <div className="inline-flex items-center gap-3 px-4 py-2 rounded-2xl bg-[#0f1115]/65 border border-white/10 backdrop-blur">
@@ -277,13 +277,13 @@ export function Hero({ activeCommittee: initialCommittee = 'ai' }: HeroProps) {
                 </AnimatePresence>
 
                 {/* bottom-left badge (next committee hint) */}
-                <AnimatePresence mode="wait">
+                <AnimatePresence>
                   <motion.div
                     key={`next-${nextKey}`}
                     initial={{ opacity: 0, x: -8 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 8 }}
-                    transition={{ duration: 0.5 }}
+                    transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
                     className="absolute bottom-4 left-4"
                   >
                     <div className="inline-flex items-center gap-3 px-4 py-2 rounded-2xl bg-[#0f1115]/55 border border-white/10 backdrop-blur">

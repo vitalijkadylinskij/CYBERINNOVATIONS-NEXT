@@ -156,12 +156,6 @@ function OrbitLabel({
         <p className="text-[11px] text-center mt-1" style={{ color: item.color }}>
           {item.subtitle}
         </p>
-        <div className="pointer-events-none absolute left-1/2 top-full mt-2 -translate-x-1/2 w-72 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity z-[9999]">
-          <div className="rounded-2xl border border-[#151515]/10 bg-white px-4 py-3 shadow-lg">
-            <p className="text-xs font-semibold text-[#151515] mb-1">{item.title}</p>
-            <p className="text-[12px] text-[#151515]/70 leading-relaxed">{item.benefits[0]}</p>
-          </div>
-        </div>
       </button>
     </motion.div>
   );
@@ -266,7 +260,7 @@ export function TargetAudience() {
                     item={item}
                     index={index}
                     isActive={activeIndex === index}
-                    isPaused={isOrbitPaused}
+                    isPaused={false}
                     onSelect={() => setActiveIndex(index)}
                     onHoverStart={() => setIsOrbitPaused(true)}
                     onHoverEnd={() => setIsOrbitPaused(false)}

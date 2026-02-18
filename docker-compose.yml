@@ -1,0 +1,94 @@
+version: '3.8'
+
+services:
+  # NGINX - Reverse Proxy с TLS termination
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: my-app-nginx
+    ports:
+      - "443:443"
+      - "80:80"
+    volumes:
+      # SSL сертификаты (самоподписанные для разработки)
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - web
+    networks:
+      - public
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:80/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Web - Next.js приложение
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    container_name: my-app-web
+    ports:
+    - "3000:3000"
+    expose:
+      - "3000"
+    environment:
+      - NODE_ENV=production
+      - BOT_SENDER_URL=http://bot-sender:3001
+      # RECAPTCHA_SECRET - установите свой ключ для CAPTCHA
+      - RECAPTCHA_SECRET=${RECAPTCHA_SECRET:-}
+    networks:
+      - public
+      - internal
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    depends_on:
+      - bot-sender
+    # Секрет для подписи запросов к bot-sender
+    secrets:
+      - internal_hmac_secret
+
+  # Bot-sender - Сервис отправки в Telegram
+  bot-sender:
+    build:
+      context: ./bot-sender
+      dockerfile: Dockerfile
+    container_name: my-app-bot-sender
+    expose:
+      - "3001"
+    environment:
+      - NODE_ENV=production
+    networks:
+      - internal
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3001/internal/send"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    # Секреты монтируются как файлы в /run/secrets/
+    secrets:
+      - telegram_bot_token
+      - internal_hmac_secret
+
+# Сети
+networks:
+  # Публичная сеть: nginx ↔ web
+  public:
+    driver: bridge
+  # Приватная сеть: web ↔ bot-sender (без доступа извне)
+  internal:
+    driver: bridge
+
+# Секреты (Docker Compose secrets)
+secrets:
+  telegram_bot_token:
+    file: ./secrets/telegram_bot_token
+  internal_hmac_secret:
+    file: ./secrets/internal_hmac_secret

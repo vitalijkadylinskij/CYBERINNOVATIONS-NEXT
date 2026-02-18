@@ -1,36 +1,148 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Telegram Bot System - Docker Compose Setup
 
-## Getting Started
+## Структура проекта
 
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```
+my-app/
+├── bot-sender/          # Сервис отправки в Telegram
+│   ├── src/
+│   │   └── index.ts    # Основной код
+│   ├── Dockerfile
+│   ├── package.json
+│   └── tsconfig.json
+├── web/                 # Next.js веб-приложение
+│   ├── app/
+│   │   ├── api/
+│   │   │   └── submit/ # API endpoint для формы
+│   │   └── ...
+│   ├── Dockerfile
+│   ├── next.config.ts
+│   └── package.json
+├── nginx/               # NGINX reverse proxy
+│   ├── ssl/            # SSL сертификаты
+│   ├── nginx.conf
+│   └── Dockerfile
+├── secrets/            # Секреты
+│   ├── telegram_bot_token
+│   └── internal_hmac_secret
+├── docker-compose.yml
+└── README.md
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Предварительная настройка
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 1. Генерация SSL сертификатов
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Для разработки сгенерируйте самоподписанные сертификаты:
 
-## Learn More
+```
+bash
+# Linux/Mac
+cd nginx/ssl
+openssl genrsa -out key.pem 2048
+openssl req -new -x509 -key key.pem -out cert.pem -days 365 -subj "/C=US/ST=State/L=City/O=Organization/CN=localhost"
 
-To learn more about Next.js, take a look at the following resources:
+# Windows (PowerShell)
+cd nginx/ssl
+openssl genrsa -out key.pem 2048
+openssl req -new -x509 -key key.pem -out cert.pem -days 365 -subj "/C=US/ST=State/L=City/O=Organization/CN=localhost"
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 2. Настройка секретов
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Создайте файлы в папке `secrets/`:
 
-## Deploy on Vercel
+**secrets/telegram_bot_token**
+```
+ВАШ_TELEGRAM_BOT_TOKEN
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+**secrets/internal_hmac_secret**
+```
+Ваш_секретный_ключ_для_HMAC_подписи
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 3. Настройка переменных окружения (опционально)
+
+Создайте файл `.env` в корне проекта:
+
+```
+env
+RECAPTCHA_SECRET=ваш_recaptcha_secret_key
+```
+
+## Запуск
+
+```
+bash
+# Сборка и запуск
+docker-compose up --build
+
+# Запуск в фоновом режиме
+docker-compose up -d
+
+# Просмотр логов
+docker-compose logs -f
+
+# Остановка
+docker-compose down
+```
+
+## Доступ
+
+- **HTTPS**: https://localhost (или ваш домен)
+- **HTTP**: http://localhost (автоматически редиректит на HTTPS)
+
+## Архитектура
+
+```
+┌─────────────────────────────────────────────────────┐
+│                 Внешний мир (интернет)               │
+│                    :443 (HTTPS)                      │
+└─────────────────────┬───────────────────────────────┘
+                      │
+                      ▼
+┌─────────────────────────────────────────────────────┐
+│  NGINX (reverse proxy)                              │
+│  - TLS termination                                  │
+│  - Rate limiting                                    │
+│  - Security headers                                 │
+└─────────────────────┬───────────────────────────────┘
+                      │
+         ┌────────────┴────────────┐
+         ▼                         ▼
+┌─────────────────┐      ┌─────────────────────┐
+│   web (Next.js) │      │  bot-sender         │
+│   :3000         │ ───► │  :3001 (internal)   │
+│   (public)      │      │                     │
+└─────────────────┘      └─────────────────────┘
+```
+
+## Требования к форме заявки
+
+Форма должна отправлять POST запрос на `/api/submit` с JSON:
+
+```
+json
+{
+  "company": "Название компании",
+  "name": "Имя контакта",
+  "email": "email@example.com",
+  "phone": "+1234567890",
+  "role": "Роль (опционально)",
+  "message": "Сообщение (опционально)",
+  "captchaToken": "токен_рекапчи",
+  "timestamp": 1234567890,
+  "honeypot": ""  // Должно быть пустым
+}
+```
+
+## Безопасность
+
+- Rate limiting: 5 запросов/сек на `/api/submit`
+- HMAC подпись запросов между web и bot-sender
+- Idempotency ключи для предотвращения дубликатов
+- CAPTCHA обязательна
+- Honeypot проверка
+- CSP заголовки
+- TLS обязателен

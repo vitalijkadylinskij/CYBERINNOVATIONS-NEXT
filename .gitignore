@@ -1,2 +1,3 @@
 .telegram_bot_token
 .internal_hmac_secret
+.env

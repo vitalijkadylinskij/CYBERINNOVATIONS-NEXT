@@ -72,18 +72,33 @@ function checkFormFillTime(data: any): boolean {
 
 // CAPTCHA проверка
 async function verifyCaptcha(token: string): Promise<boolean> {
-  if (!token || !RECAPTCHA_SECRET) return false;
+  if (!token || !process.env.RECAPTCHA_SECRET) {
+    console.error('No captcha token received')
+    return false
+  }
+
+  const secret = process.env.RECAPTCHA_SECRET
+  if (!secret) {
+    console.error('Missing RECAPTCHA_SECRET')
+    return false
+  }
+
   try {
-    const response = await fetch('https://www.google.com/recaptcha/api/siteverify', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: `secret=${RECAPTCHA_SECRET}&response=${token}`,
-    });
-    const data = await response.json();
-    return data.success === true;
+    const response = await fetch(
+      'https://www.google.com/recaptcha/api/siteverify',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `secret=${process.env.RECAPTCHA_SECRET}&response=${token}`,
+      }
+    )
+
+    const data = await response.json()
+    console.log('RECAPTCHA response:', data)
+    return data.success === true
   } catch (error) {
-    console.error('CAPTCHA verification error:', error);
-    return false;
+    console.error('CAPTCHA verification error:', error)
+    return false
   }
 }
 

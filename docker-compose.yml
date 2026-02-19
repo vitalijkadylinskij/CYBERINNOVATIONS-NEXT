@@ -29,6 +29,9 @@ services:
     build:
       context: ./web
       dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_RECAPTCHA_SITE_KEY: ${NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+        RECAPTCHA_SECRET: ${RECAPTCHA_SECRET}
     container_name: my-app-web
     ports:
     - "3000:3000"
@@ -37,8 +40,7 @@ services:
     environment:
       - NODE_ENV=production
       - BOT_SENDER_URL=http://bot-sender:3001
-      # RECAPTCHA_SECRET - установите свой ключ для CAPTCHA
-      - RECAPTCHA_SECRET=${RECAPTCHA_SECRET:-}
+      - RECAPTCHA_SECRET=${RECAPTCHA_SECRET}
     networks:
       - public
       - internal

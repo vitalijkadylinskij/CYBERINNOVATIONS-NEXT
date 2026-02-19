@@ -103,68 +103,65 @@ export function Documents() {
 
   // Подключение reCAPTCHA v2
   useEffect(() => {
-    const script = document.createElement('script')
-    script.src = 'https://www.google.com/recaptcha/api.js?render=explicit'
-    script.async = true
-    document.body.appendChild(script)
-
-    const initCaptcha = () => {
-      if (window.grecaptcha && document.getElementById('recaptcha-container')) {
-        window.grecaptcha.render('recaptcha-container', {
-          sitekey: process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!,
-          callback: (token: string) => setCaptchaToken(token),
-        })
-      }
-    }
-
-    script.onload = initCaptcha
-
+    (window as any).onCaptchaSuccess = (token: string) => {
+      console.log("Token received:", token);
+      setCaptchaToken(token);
+    };
+  
+    const script = document.createElement("script");
+    script.src = "https://www.google.com/recaptcha/api.js";
+    script.async = true;
+    script.defer = true;
+  
+    document.body.appendChild(script);
+  
     return () => {
-      document.body.removeChild(script)
-    }
-  }, [])
+      document.body.removeChild(script);
+    };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setError(null)
-
-    if (Date.now() - formStartTime < 3000) {
-      setError('Форма отправляется слишком быстро.')
-      setLoading(false)
-      return
-    }
-
-    if (formData.honeypot) {
-      setError('Бот-обнаружен.')
-      setLoading(false)
-      return
-    }
+    e.preventDefault();
 
     if (!captchaToken) {
-      setError('Пожалуйста, пройдите CAPTCHA')
-      setLoading(false)
-      return
+      setError("Пожалуйста, пройдите CAPTCHA");
+      return;
     }
-
+  
+    window.grecaptcha.execute();
+  
     try {
-      const dataToSend = { ...formData, timestamp: formStartTime, captchaToken }
-
+      // Проверка скорости отправки формы (минимум 3 секунды)
+      if (Date.now() - formStartTime < 3000) {
+        setError('Форма отправляется слишком быстро.');
+        return;
+      }
+  
+      // Проверка honeypot — для защиты от ботов
+      if (formData.honeypot) {
+        setError('Бот-обнаружен.');
+        return;
+      }
+  
+      // Подготовка данных для отправки
+      const dataToSend = { ...formData, timestamp: formStartTime, captchaToken };
+  
+      // Отправка запроса на сервер
       const response = await fetch('/api/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(dataToSend),
-      })
-
-      const data = await response.json()
-
+      });
+  
+      const data = await response.json();
+  
       if (!response.ok) {
-        setError(data.error || 'Произошла ошибка при отправке')
-        setLoading(false)
-        return
+        setError(data.error || 'Произошла ошибка при отправке');
+        return;
       }
-
-      setSubmitted(true)
+  
+      // Успешная отправка — обновляем UI
+      setSubmitted(true);
       setFormData({
         company: '',
         name: '',
@@ -173,22 +170,25 @@ export function Documents() {
         role: getRoleFromSearchParams(),
         message: '',
         honeypot: '',
-      })
-
-      // Сброс reCAPTCHA после успешной отправки
-      if (window.grecaptcha && window.grecaptcha.reset) {
-        window.grecaptcha.reset()
+      });
+  
+      // Сброс reCAPTCHA (если библиотека загружена)
+      if (window.grecaptcha?.reset) {
+        window.grecaptcha.reset();
       }
-      setCaptchaToken('')
-
-      setTimeout(() => setSubmitted(false), 3500)
+      setCaptchaToken('');
+  
+      setTimeout(() => setSubmitted(false), 3500);
+  
     } catch (err: any) {
-      console.error(err)
-      setError(err?.message || 'Не удалось отправить форму. Попробуйте позже.')
+      console.error('Ошибка при отправке формы:', err);
+      setError(err?.message || 'Не удалось отправить форму. Попробуйте позже.');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
+  console.log("PROD SITE KEY:", process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY)
+  console.log("SECRET:", process.env.RECAPTCHA_SECRET)
 
   return (
     <section className="py-24 relative overflow-hidden" id="documents">
@@ -345,7 +345,11 @@ export function Documents() {
                     <Textarea placeholder="Сообщение (необязательно)" value={formData.message} onChange={(e) => setFormData({ ...formData, message: e.target.value })} className="bg-white/10 border-white/10 text-[#F3F4E9] placeholder:text-[#F3F4E9]/45 focus:border-[#5F891D]" rows={4} />
 
                     {/* reCAPTCHA */}
-                    <div id="recaptcha-container" className="my-4"></div>
+                    <div
+                    className="g-recaptcha"
+                    data-sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
+                    data-callback="onCaptchaSuccess"
+/>
 
                     {error && <p className="text-[#F8911D] text-sm">{error}</p>}
 

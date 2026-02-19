@@ -14,6 +14,12 @@ RUN npm ci --prefer-offline --no-audit
 # Копируем исходный код
 COPY . .
 
+ARG NEXT_PUBLIC_RECAPTCHA_SITE_KEY
+ARG RECAPTCHA_SECRET
+
+ENV NEXT_PUBLIC_RECAPTCHA_SITE_KEY=$NEXT_PUBLIC_RECAPTCHA_SITE_KEY
+ENV RECAPTCHA_SECRET=$RECAPTCHA_SECRET
+
 # Устанавливаем зависимости для сборки
 RUN npm run build
 

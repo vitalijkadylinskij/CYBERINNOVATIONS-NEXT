@@ -35,13 +35,8 @@ coverage
 *.env.development.local
 *.env.test.local
 *.env.production.local
-
-# Storybook
-.storybook
+.env
+.env.*
 
 # TypeScript
 *.tsbuildinfo
-next-env.d.ts
-
-# Secrets (mounted from host in production)
-../secrets

@@ -1,9 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
+import fs from 'fs';
 
 // Конфигурация
 const BOT_SENDER_URL = process.env.BOT_SENDER_URL || 'http://bot-sender:3001';
-const INTERNAL_HMAC_SECRET = process.env.INTERNAL_HMAC_SECRET || '';
+
+// Читаем INTERNAL_HMAC_SECRET из переменной окружения или файла
+let INTERNAL_HMAC_SECRET = process.env.INTERNAL_HMAC_SECRET || '';
+const hmacSecretFile = process.env.INTERNAL_HMAC_SECRET_FILE;
+if (!INTERNAL_HMAC_SECRET && hmacSecretFile) {
+  try {
+    INTERNAL_HMAC_SECRET = fs.readFileSync(hmacSecretFile, 'utf8').trim();
+  } catch (e) {
+    console.error('Failed to read HMAC secret file:', e);
+  }
+}
+
 const RECAPTCHA_SECRET = process.env.RECAPTCHA_SECRET || '';
 
 // In-memory rate limiting (production используйте Redis)
@@ -73,13 +85,7 @@ function checkFormFillTime(data: any): boolean {
 // CAPTCHA проверка
 async function verifyCaptcha(token: string): Promise<boolean> {
   if (!token || !process.env.RECAPTCHA_SECRET) {
-    console.error('No captcha token received')
-    return false
-  }
-
-  const secret = process.env.RECAPTCHA_SECRET
-  if (!secret) {
-    console.error('Missing RECAPTCHA_SECRET')
+    console.error('No captcha token received or missing RECAPTCHA_SECRET')
     return false
   }
 

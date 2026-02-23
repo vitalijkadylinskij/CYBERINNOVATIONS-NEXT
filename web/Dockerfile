@@ -38,6 +38,9 @@ COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
+# Копируем файл с секретом
+COPY --from=builder /app/secrets ./secrets
+
 # Устанавливаем только production зависимости
 RUN npm install --omit=dev --omit=peer
 
@@ -47,6 +50,7 @@ USER nextjs
 # Переменные окружения
 ENV NODE_ENV=production
 ENV PORT=3000
+ENV INTERNAL_HMAC_SECRET_FILE=/app/secrets/internal_hmac_secret
 
 # Expose port
 EXPOSE 3000
@@ -55,5 +59,5 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:3000/ || exit 1
 
-# Start
-CMD ["npm", "start"]
+# Start (standalone mode uses server.js directly)
+CMD ["node", "server.js"]

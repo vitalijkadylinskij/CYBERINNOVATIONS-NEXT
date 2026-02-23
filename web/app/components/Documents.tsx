@@ -128,8 +128,6 @@ export function Documents() {
       return;
     }
   
-    window.grecaptcha.execute();
-  
     try {
       // Проверка скорости отправки формы (минимум 3 секунды)
       if (Date.now() - formStartTime < 3000) {
@@ -188,7 +186,6 @@ export function Documents() {
     }
   };
   console.log("PROD SITE KEY:", process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY)
-  console.log("SECRET:", process.env.RECAPTCHA_SECRET)
 
   return (
     <section className="py-24 relative overflow-hidden" id="documents">
@@ -347,7 +344,7 @@ export function Documents() {
                     {/* reCAPTCHA */}
                     <div
                     className="g-recaptcha"
-                    data-sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
+                    data-sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
                     data-callback="onCaptchaSuccess"
 />
 

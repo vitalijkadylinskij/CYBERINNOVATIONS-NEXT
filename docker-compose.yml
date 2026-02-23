@@ -27,7 +27,7 @@ services:
   # Web - Next.js приложение
   web:
     build:
-      context: ./web
+      context: .
       dockerfile: Dockerfile
       args:
         NEXT_PUBLIC_RECAPTCHA_SITE_KEY: ${NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
@@ -41,6 +41,9 @@ services:
       - NODE_ENV=production
       - BOT_SENDER_URL=http://bot-sender:3001
       - RECAPTCHA_SECRET=${RECAPTCHA_SECRET}
+      - NEXT_PUBLIC_RECAPTCHA_SITE_KEY=${NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+    secrets:
+      - internal_hmac_secret
     networks:
       - public
       - internal
@@ -52,9 +55,6 @@ services:
       retries: 3
     depends_on:
       - bot-sender
-    # Секрет для подписи запросов к bot-sender
-    secrets:
-      - internal_hmac_secret
 
   # Bot-sender - Сервис отправки в Telegram
   bot-sender:

@@ -9,8 +9,8 @@ app.use(express.json({ limit: '10kb' })); // лимит payload
 const TELEGRAM_BOT_TOKEN = require('fs').readFileSync('/run/secrets/telegram_bot_token', 'utf-8').trim();
 const INTERNAL_HMAC_SECRET = require('fs').readFileSync('/run/secrets/internal_hmac_secret', 'utf-8').trim();
 
-// Список Telegram ID получателей (allowlist)
-const RECIPIENT_USER_IDS = process.env.RECIPIENT_USER_IDS?.split(',') || ['vitalikadylinskiy'];
+// Список Telegram ID получателей (allowlist) - можно использовать username (без @) или chat_id
+const RECIPIENT_USER_IDS = process.env.RECIPIENT_USER_IDS?.split(',') || ['473779853'];
 
 // In-memory LRU cache для idempotency ключей
 const idempotencyKeys = new Map<string, number>();
@@ -89,6 +89,42 @@ deleteWebhookOnStartup();
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).send({ status: 'ok' });
+});
+
+// Debug endpoint для получения chat_id
+app.get('/debug/chat-id/:token', async (req, res) => {
+  const { token } = req.params;
+  
+  // Простой механизм защиты
+  if (token !== TELEGRAM_BOT_TOKEN.slice(0, 10)) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  
+  try {
+    // Получаем обновления
+    const response = await axios.get(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates`);
+    const updates = response.data.result;
+    
+    if (updates.length === 0) {
+      return res.json({ 
+        message: 'No updates found. Send /start to your bot first!',
+        instructions: '1. Open your bot in Telegram\n2. Send /start\n3. Wait a few seconds\n4. Refresh this page'
+      });
+    }
+    
+    // Берем последние update
+    const lastUpdate = updates[updates.length - 1];
+    const chat = lastUpdate.message?.chat || lastUpdate.my_chat_member?.chat;
+    
+    res.json({
+      chat_id: chat.id,
+      username: chat.username,
+      first_name: chat.first_name,
+      last_update: lastUpdate
+    });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 // Основной endpoint для отправки

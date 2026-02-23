@@ -1,8 +1,9 @@
 "use client";
-import { useMemo, useState, useEffect, useRef } from 'react';
-import { motion, useMotionValue, animate } from "framer-motion";
+import { useMemo, useState } from 'react';
+import { motion } from "framer-motion";
 import { Building2, GraduationCap, Briefcase, Rocket, Users, Check } from 'lucide-react';
 import Image from 'next/image';
+import OrbitLabels from './ui/OrbitLabels';
 
 interface AudienceGroup {
   icon: React.ElementType;
@@ -81,86 +82,6 @@ const audiences: AudienceGroup[] = [
   },
 ];
 
-const ORBIT_DURATION = 58;
-const ORBIT_RADIUS_X = 45;
-const ORBIT_RADIUS_Y = 50;
-
-function OrbitLabel({
-  item,
-  index,
-  isActive,
-  isPaused,
-  onSelect,
-  onHoverStart,
-  onHoverEnd,
-  delay,
-}: {
-  item: AudienceGroup;
-  index: number;
-  isActive: boolean;
-  isPaused: boolean;
-  onSelect: () => void;
-  onHoverStart: () => void;
-  onHoverEnd: () => void;
-  delay: number;
-}) {
-  const angle = useMotionValue(index * 72);
-  const controlsRef = useRef<ReturnType<typeof animate> | null>(null);
-
-  const [coords, setCoords] = useState<{ left: string; top: string } | null>(null);
-
-  useEffect(() => {
-    const calcLeft = (a: number) => `${50 + ORBIT_RADIUS_X * Math.cos((a * Math.PI) / 180)}%`;
-    const calcTop = (a: number) => `${50 + ORBIT_RADIUS_Y * Math.sin((a * Math.PI) / 180)}%`;
-
-    setCoords({ left: calcLeft(index * 72), top: calcTop(index * 72) });
-
-    controlsRef.current = animate(angle, 360 + index * 72, {
-      duration: ORBIT_DURATION,
-      repeat: Infinity,
-      ease: 'linear',
-      delay,
-      onUpdate: (a) => setCoords({ left: calcLeft(a), top: calcTop(a) }),
-    });
-
-    return () => {
-      controlsRef.current?.stop();
-      controlsRef.current = null;
-    };
-  }, [angle, delay, index]);
-
-  useEffect(() => {
-    if (controlsRef.current) {
-      isPaused ? controlsRef.current.pause() : controlsRef.current.play();
-    }
-  }, [isPaused]);
-
-  if (!coords) return null;
-
-  return (
-    <motion.div
-      className="absolute w-32 xl:w-40 pointer-events-auto -translate-x-1/2 -translate-y-1/2"
-      style={{ left: coords.left, top: coords.top }}
-    >
-      <button
-        type="button"
-        onMouseEnter={() => { onSelect(); onHoverStart(); }}
-        onMouseLeave={onHoverEnd}
-        onFocus={onSelect}
-        onClick={onSelect}
-        className={`relative group w-full rounded-2xl bg-white/90 border px-4 py-3 shadow-sm transition-all ${
-          isActive ? 'border-[#5F891D]/35 shadow-md' : 'border-[#151515]/10 hover:shadow-md'
-        }`}
-      >
-        <p className="text-sm font-semibold text-[#151515] text-center">{item.shortLabel}</p>
-        <p className="text-[11px] text-center mt-1" style={{ color: item.color }}>
-          {item.subtitle}
-        </p>
-      </button>
-    </motion.div>
-  );
-}
-
 type Partner = { name: string; logo?: string };
 
 const partners: Partner[] = [
@@ -199,10 +120,29 @@ function PartnerChip({ name, logo }: Partner) {
 
 export function TargetAudience() {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [isOrbitPaused, setIsOrbitPaused] = useState(false);
 
   const active = useMemo(() => audiences[activeIndex], [activeIndex]);
   const ActiveIcon = active.icon;
+
+  const labelItems = useMemo(() => 
+    audiences.map((item, index) => (
+      <button
+        key={item.title}
+        type="button"
+        onClick={() => setActiveIndex(index)}
+        onMouseEnter={() => setActiveIndex(index)}
+        className={`relative group w-full rounded-2xl bg-white/90 border px-4 py-3 shadow-sm transition-all pointer-events-auto ${
+          activeIndex === index ? 'border-[#5F891D]/35 shadow-md' : 'border-[#151515]/10 hover:shadow-md'
+        }`}
+      >
+        <p className="text-sm font-semibold text-[#151515] text-center">{item.shortLabel}</p>
+        <p className="text-[11px] text-center mt-1" style={{ color: item.color }}>
+          {item.subtitle}
+        </p>
+      </button>
+    )), 
+    [activeIndex]
+  );
 
   return (
     <section className="py-24 relative overflow-hidden" id="audience">
@@ -244,8 +184,8 @@ export function TargetAudience() {
               ))}
             </div>
 
-            {/* Орбита для десктопа */}
-            <div className="hidden lg:flex absolute inset-0 items-center justify-center pointer-events-none">
+            {/* Орбита для десктопа и планшета */}
+            <div className="hidden md:flex absolute inset-0 items-center justify-center pointer-events-none">
               <div className="absolute inset-0 pointer-events-none">
                 <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden>
                   <circle cx="50" cy="50" r="36" fill="none" stroke="#5F68A530" strokeDasharray="2 2" />
@@ -253,25 +193,44 @@ export function TargetAudience() {
                 </svg>
               </div>
 
-              <div className="absolute w-[95%] h-[95%] z-30" style={{ left: '2.5%', top: '2.5%' }}>
-                {audiences.map((item, index) => (
-                  <OrbitLabel
-                    key={item.title}
-                    item={item}
-                    index={index}
-                    isActive={activeIndex === index}
-                    isPaused={false}
-                    onSelect={() => setActiveIndex(index)}
-                    onHoverStart={() => setIsOrbitPaused(true)}
-                    onHoverEnd={() => setIsOrbitPaused(false)}
-                    delay={index * 0.8}
-                  />
-                ))}
+              {/* Адаптивные настройки орбиты для разных экранов */}
+              <div className="w-full hidden min-[1536px]:block absolute left-[30%] z-40 pointer-events-none">
+                <OrbitLabels
+                  items={labelItems}
+                  baseWidth={540}
+                  radiusX={110}
+                  radiusY={45}
+                  duration={58}
+                  itemWidth={160}
+                  itemHeight={80}
+                />
+              </div>
+              <div className="w-full hidden min-[1280px]:block max-[1535px]:block absolute left-[30%] z-40 pointer-events-none">
+                <OrbitLabels
+                  items={labelItems}
+                  baseWidth={480}
+                  radiusX={105}
+                  radiusY={52}
+                  duration={58}
+                  itemWidth={160}
+                  itemHeight={80}
+                />
+              </div>
+              <div className="w-full hidden lg:block absolute left-[27%] z-40 pointer-events-none">
+                <OrbitLabels
+                  items={labelItems}
+                  baseWidth={400}
+                  radiusX={100}
+                  radiusY={65}
+                  duration={58}
+                  itemWidth={130}
+                  itemHeight={70}
+                />
               </div>
             </div>
 
             {/* Центр */}
-            <div className="relative mt-4 lg:mt-0 lg:absolute lg:top-1/2 lg:left-1/2 lg:-translate-x-1/2 lg:-translate-y-1/2 w-full lg:w-[360px] z-10">
+            <div className="relative mt-4 lg:mt-0 lg:absolute lg:top-1/2 lg:left-1/2 lg:-translate-x-1/2 lg:-translate-y-1/2 w-full lg:w-[360px] z-0">
               <div className="relative rounded-3xl bg-white border border-[#151515]/10 p-6 md:p-8 text-center overflow-hidden shadow-sm">
                 <motion.div aria-hidden className="absolute -inset-24 rounded-full bg-gradient-to-r from-[#5F68A5]/12 via-[#5F891D]/10 to-transparent" animate={{ rotate: 360 }} transition={{ duration: 30, repeat: Infinity, ease: 'linear' }} />
                 <motion.div aria-hidden className="absolute inset-0" animate={{ opacity: [0.35, 0.6, 0.35] }} transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}>

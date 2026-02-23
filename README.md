@@ -10,65 +10,53 @@ my-app/
 │   ├── Dockerfile
 │   ├── package.json
 │   └── tsconfig.json
-├── web/                 # Next.js веб-приложение
+├── web/                 # Next.js веб-приложение с nginx
 │   ├── app/
 │   │   ├── api/
 │   │   │   └── submit/ # API endpoint для формы
 │   │   └── ...
 │   ├── Dockerfile
+│   ├── nginx.conf       # Конфигурация nginx
 │   ├── next.config.ts
 │   └── package.json
-├── nginx/               # NGINX reverse proxy
-│   ├── ssl/            # SSL сертификаты
-│   ├── nginx.conf
-│   └── Dockerfile
-├── secrets/            # Секреты
-│   ├── telegram_bot_token
-│   └── internal_hmac_secret
+├── .env                # Переменные окружения
+├── .env.example        # Пример переменных окружений
 ├── docker-compose.yml
 └── README.md
 ```
 
 ## Предварительная настройка
 
-### 1. Генерация SSL сертификатов
+### 1. Настройка переменных окружения
 
-Для разработки сгенерируйте самоподписанные сертификаты:
+Создайте файл `.env` в корне проекта (можно скопировать из `.env.example`):
+
+```
+env
+# Обязательные переменные
+TELEGRAM_BOT_TOKEN=ваш_telegram_bot_token
+INTERNAL_HMAC_SECRET=ваш_секретный_ключ_hmac
+
+# Опциональные переменные
+RECAPTCHA_SECRET=ваш_recaptcha_secret_key
+NEXT_PUBLIC_RECAPTCHA_SITE_KEY=ваш_recaptcha_site_key
+```
+
+### 2. Генерация SSL сертификатов (для HTTPS)
+
+Самоподписанные сертификаты уже находятся в `web/nginx/ssl/`. Для генерации новых:
 
 ```
 bash
 # Linux/Mac
-cd nginx/ssl
+cd web/nginx/ssl
 openssl genrsa -out key.pem 2048
 openssl req -new -x509 -key key.pem -out cert.pem -days 365 -subj "/C=US/ST=State/L=City/O=Organization/CN=localhost"
 
 # Windows (PowerShell)
-cd nginx/ssl
+cd web/nginx/ssl
 openssl genrsa -out key.pem 2048
 openssl req -new -x509 -key key.pem -out cert.pem -days 365 -subj "/C=US/ST=State/L=City/O=Organization/CN=localhost"
-```
-
-### 2. Настройка секретов
-
-Создайте файлы в папке `secrets/`:
-
-**secrets/telegram_bot_token**
-```
-ВАШ_TELEGRAM_BOT_TOKEN
-```
-
-**secrets/internal_hmac_secret**
-```
-Ваш_секретный_ключ_для_HMAC_подписи
-```
-
-### 3. Настройка переменных окружения (опционально)
-
-Создайте файл `.env` в корне проекта:
-
-```
-env
-RECAPTCHA_SECRET=ваш_recaptcha_secret_key
 ```
 
 ## Запуск
@@ -90,32 +78,30 @@ docker-compose down
 
 ## Доступ
 
-- **HTTPS**: https://localhost (или ваш домен)
-- **HTTP**: http://localhost (автоматически редиректит на HTTPS)
+- **HTTP**: http://localhost
+- **HTTPS**: https://localhost (если настроены сертификаты)
 
 ## Архитектура
 
 ```
 ┌─────────────────────────────────────────────────────┐
 │                 Внешний мир (интернет)               │
-│                    :443 (HTTPS)                      │
+│                    :80 / :443                        │
 └─────────────────────┬───────────────────────────────┘
                       │
                       ▼
 ┌─────────────────────────────────────────────────────┐
-│  NGINX (reverse proxy)                              │
-│  - TLS termination                                  │
-│  - Rate limiting                                    │
-│  - Security headers                                 │
+│  Web Container (nginx + Next.js)                   │
+│  - nginx:80 - Reverse proxy                         │
+│  - nginx:443 - TLS termination (если настроено)    │
+│  - Next.js:3000 - Application                       │
 └─────────────────────┬───────────────────────────────┘
                       │
-         ┌────────────┴────────────┐
-         ▼                         ▼
-┌─────────────────┐      ┌─────────────────────┐
-│   web (Next.js) │      │  bot-sender         │
-│   :3000         │ ───► │  :3001 (internal)   │
-│   (public)      │      │                     │
-└─────────────────┘      └─────────────────────┘
+                      ▼
+┌─────────────────────────────────────────────────────┐
+│  bot-sender (:3001, internal network only)         │
+│  - Отправка сообщений в Telegram                    │
+└─────────────────────────────────────────────────────┘
 ```
 
 ## Требования к форме заявки
@@ -145,4 +131,4 @@ json
 - CAPTCHA обязательна
 - Honeypot проверка
 - CSP заголовки
-- TLS обязателен
+- Security headers (X-Frame-Options, X-Content-Type-Options, etc.)

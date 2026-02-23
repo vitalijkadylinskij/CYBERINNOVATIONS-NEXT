@@ -5,9 +5,28 @@ import axios from 'axios';
 const app = express();
 app.use(express.json({ limit: '10kb' })); // лимит payload
 
-// Читаем секреты из файлов
-const TELEGRAM_BOT_TOKEN = require('fs').readFileSync('/run/secrets/telegram_bot_token', 'utf-8').trim();
-const INTERNAL_HMAC_SECRET = require('fs').readFileSync('/run/secrets/internal_hmac_secret', 'utf-8').trim();
+// Читаем секреты из переменных окружения или файлов
+let TELEGRAM_BOT_TOKEN: string | undefined = process.env.TELEGRAM_BOT_TOKEN;
+if (!TELEGRAM_BOT_TOKEN) {
+  try {
+    TELEGRAM_BOT_TOKEN = require('fs').readFileSync('/run/secrets/telegram_bot_token', 'utf-8').trim();
+  } catch (e) {
+    console.error('TELEGRAM_BOT_TOKEN not found in environment or secrets file');
+  }
+}
+
+let INTERNAL_HMAC_SECRET: string | undefined = process.env.INTERNAL_HMAC_SECRET;
+if (!INTERNAL_HMAC_SECRET) {
+  try {
+    INTERNAL_HMAC_SECRET = require('fs').readFileSync('/run/secrets/internal_hmac_secret', 'utf-8').trim();
+  } catch (e) {
+    console.error('INTERNAL_HMAC_SECRET not found in environment or secrets file');
+  }
+}
+
+// Ensure secrets are defined for HMAC and Telegram API calls
+const HMAC_SECRET = INTERNAL_HMAC_SECRET || '';
+const BOT_TOKEN = TELEGRAM_BOT_TOKEN || '';
 
 // Список Telegram ID получателей (allowlist) - можно использовать username (без @) или chat_id
 const RECIPIENT_USER_IDS = process.env.RECIPIENT_USER_IDS?.split(',') || ['473779853'];
@@ -26,10 +45,10 @@ setInterval(() => {
   }
 }, 2 * 60 * 1000);
 
-// Фрификации подписи HMAC
+// Верификация подписи HMAC
 function verifySignature(body: string, timestamp: string, signature: string): boolean {
   const expected = crypto
-    .createHmac('sha256', INTERNAL_HMAC_SECRET)
+    .createHmac('sha256', HMAC_SECRET)
     .update(body + '.' + timestamp)
     .digest('hex');
   return expected === signature;
@@ -43,7 +62,7 @@ async function sendToTelegram(message: string): Promise<boolean> {
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
       for (const userId of RECIPIENT_USER_IDS) {
-        await axios.post(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+        await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
           chat_id: userId.trim(),
           text: message,
           parse_mode: 'HTML',
@@ -73,8 +92,12 @@ async function sendToTelegram(message: string): Promise<boolean> {
 
 // Функция удаления webhook при старте
 async function deleteWebhookOnStartup(): Promise<void> {
+  if (!BOT_TOKEN) {
+    console.error('TELEGRAM_BOT_TOKEN is not set, skipping webhook deletion');
+    return;
+  }
   try {
-    await axios.post(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/deleteWebhook`, {
+    await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/deleteWebhook`, {
       drop_pending_updates: true,
     });
     console.log('Webhook deleted successfully');
@@ -96,13 +119,13 @@ app.get('/debug/chat-id/:token', async (req, res) => {
   const { token } = req.params;
   
   // Простой механизм защиты
-  if (token !== TELEGRAM_BOT_TOKEN.slice(0, 10)) {
+  if (!BOT_TOKEN || token !== BOT_TOKEN.slice(0, 10)) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
   
   try {
     // Получаем обновления
-    const response = await axios.get(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates`);
+    const response = await axios.get(`https://api.telegram.org/bot${BOT_TOKEN}/getUpdates`);
     const updates = response.data.result;
     
     if (updates.length === 0) {

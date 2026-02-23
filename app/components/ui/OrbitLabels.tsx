@@ -51,11 +51,11 @@ export default function OrbitLabels({
       // z-index based on position (items in front have higher z-index)
       const zIndex = Math.round(Math.sin(angleRad) * 50 + 50);
       
-      // scale based on z-position (items in front are bigger)
-      const scale = 0.7 + (Math.sin(angleRad) + 1) * 0.3;
+      // scale based on z-position - increased min scale to 0.9 for better readability
+      const scale = 0.9 + (Math.sin(angleRad) + 1) * 0.1;
       
-      // opacity based on z-position (items in back are more transparent)
-      const opacity = 0.5 + (Math.sin(angleRad) + 1) * 0.5;
+      // no transparency - always fully visible for maximum clarity
+      const opacity = 1;
       
       const left = `${50 + radiusX * Math.cos(angleRad)}%`;
       const top = `${50 + radiusY * Math.sin(angleRad)}%`;
@@ -114,7 +114,7 @@ export default function OrbitLabels({
               transform: `translate(-50%, -50%) scale(${positions[index]?.scale || 1})`,
               opacity: positions[index]?.opacity || 1,
               zIndex: positions[index]?.zIndex || 50,
-              transition: 'opacity 0.1s, transform 0.1s',
+              transition: 'opacity 0.4s ease-out, transform 0.4s ease-out, filter 0.4s ease-out',
               filter: `drop-shadow(0px ${positions[index]?.zIndex ? (positions[index].zIndex - 50) * 0.5 : 0}px 8px rgba(0,0,0,0.15))`,
             }}
           >

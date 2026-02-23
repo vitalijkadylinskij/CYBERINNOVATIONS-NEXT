@@ -185,7 +185,7 @@ export function TargetAudience() {
             </div>
 
             {/* Орбита для десктопа и планшета */}
-            <div className="hidden md:flex absolute inset-0 items-center justify-center pointer-events-none">
+            <div className="hidden min-[1024px]:flex absolute inset-0 items-center justify-center pointer-events-none">
               <div className="absolute inset-0 pointer-events-none">
                 <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden>
                   <circle cx="50" cy="50" r="36" fill="none" stroke="#5F68A530" strokeDasharray="2 2" />
@@ -205,7 +205,7 @@ export function TargetAudience() {
                   itemHeight={80}
                 />
               </div>
-              <div className="w-full hidden min-[1280px]:block max-[1535px]:block absolute left-[30%] z-40 pointer-events-none">
+              <div className="w-full hidden min-[1280px]:block 2xl:hidden absolute left-[30%] z-40 pointer-events-none">
                 <OrbitLabels
                   items={labelItems}
                   baseWidth={480}
@@ -216,7 +216,7 @@ export function TargetAudience() {
                   itemHeight={80}
                 />
               </div>
-              <div className="w-full hidden lg:block absolute left-[27%] z-40 pointer-events-none">
+              <div className="w-full hidden lg:block xl:hidden absolute left-[27%] z-40 pointer-events-none">
                 <OrbitLabels
                   items={labelItems}
                   baseWidth={400}

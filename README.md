@@ -1,134 +1,122 @@
-# Telegram Bot System - Docker Compose Setup
+# CYBERINNOVATIONS-NEXT
 
-## Структура проекта
+Прод-конфигурация проекта для запуска через `docker compose`:
+- `web` (Next.js, порт контейнера `3000`)
+- `bot-sender` (внутренний сервис отправки в Telegram, порт контейнера `3001`, наружу не публикуется)
 
-```
-my-app/
-├── bot-sender/          # Сервис отправки в Telegram
-│   ├── src/
-│   │   └── index.ts    # Основной код
+## Структура
+
+```text
+CYBERINNOVATIONS-NEXT/
+├── bot-sender/
+│   ├── src/index.ts
 │   ├── Dockerfile
 │   ├── package.json
 │   └── tsconfig.json
-├── web/                 # Next.js веб-приложение с nginx
+├── web/
 │   ├── app/
-│   │   ├── api/
-│   │   │   └── submit/ # API endpoint для формы
-│   │   └── ...
+│   ├── public/
 │   ├── Dockerfile
-│   ├── nginx.conf       # Конфигурация nginx
-│   ├── next.config.ts
-│   └── package.json
-├── .env                # Переменные окружения
-├── .env.example        # Пример переменных окружений
+│   ├── package.json
+│   └── next.config.mjs
+├── .env.example
 ├── docker-compose.yml
 └── README.md
 ```
 
-## Предварительная настройка
+## 1. Подготовка
 
-### 1. Настройка переменных окружения
+1. Убедитесь, что установлены Docker и Docker Compose Plugin (`docker compose version`).
+2. Создайте файл окружения:
 
-Создайте файл `.env` в корне проекта (можно скопировать из `.env.example`):
-
-```
-env
-# Обязательные переменные
-TELEGRAM_BOT_TOKEN=ваш_telegram_bot_token
-INTERNAL_HMAC_SECRET=ваш_секретный_ключ_hmac
-
-# Опциональные переменные
-RECAPTCHA_SECRET=ваш_recaptcha_secret_key
-NEXT_PUBLIC_RECAPTCHA_SITE_KEY=ваш_recaptcha_site_key
+```bash
+cp .env.example .env
+chmod 600 .env
 ```
 
-### 2. Генерация SSL сертификатов (для HTTPS)
+3. Сгенерируйте секрет для внутренней HMAC-подписи:
 
-Самоподписанные сертификаты уже находятся в `web/nginx/ssl/`. Для генерации новых:
-
-```
-bash
-# Linux/Mac
-cd web/nginx/ssl
-openssl genrsa -out key.pem 2048
-openssl req -new -x509 -key key.pem -out cert.pem -days 365 -subj "/C=US/ST=State/L=City/O=Organization/CN=localhost"
-
-# Windows (PowerShell)
-cd web/nginx/ssl
-openssl genrsa -out key.pem 2048
-openssl req -new -x509 -key key.pem -out cert.pem -days 365 -subj "/C=US/ST=State/L=City/O=Organization/CN=localhost"
+```bash
+openssl rand -hex 32
 ```
 
-## Запуск
+Если `openssl` недоступен:
 
-```
-bash
-# Сборка и запуск
-docker-compose up --build
-
-# Запуск в фоновом режиме
-docker-compose up -d
-
-# Просмотр логов
-docker-compose logs -f
-
-# Остановка
-docker-compose down
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
 
-## Доступ
+4. Получите `TELEGRAM_BOT_TOKEN`:
+1. Откройте `@BotFather` в Telegram.
+2. Выполните `/newbot`.
+3. Скопируйте токен вида `1234567890:AA...`.
 
-- **HTTP**: http://localhost
-- **HTTPS**: https://localhost (если настроены сертификаты)
+5. Получите `RECIPIENT_USER_IDS` (chat id получателей):
+1. Отправьте вашему боту команду `/start`.
+2. Выполните:
 
-## Архитектура
-
-```
-┌─────────────────────────────────────────────────────┐
-│                 Внешний мир (интернет)               │
-│                    :80 / :443                        │
-└─────────────────────┬───────────────────────────────┘
-                      │
-                      ▼
-┌─────────────────────────────────────────────────────┐
-│  Web Container (nginx + Next.js)                   │
-│  - nginx:80 - Reverse proxy                         │
-│  - nginx:443 - TLS termination (если настроено)    │
-│  - Next.js:3000 - Application                       │
-└─────────────────────┬───────────────────────────────┘
-                      │
-                      ▼
-┌─────────────────────────────────────────────────────┐
-│  bot-sender (:3001, internal network only)         │
-│  - Отправка сообщений в Telegram                    │
-└─────────────────────────────────────────────────────┘
+```bash
+export TELEGRAM_BOT_TOKEN='ваш_токен'
+curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates" | jq -r '.result[]?.message?.chat?.id' | sort -u
 ```
 
-## Требования к форме заявки
+3. Вставьте одно или несколько значений в `.env` через запятую.
 
-Форма должна отправлять POST запрос на `/api/submit` с JSON:
+6. Получите reCAPTCHA ключи:
+1. Создайте сайт в [Google reCAPTCHA Admin](https://www.google.com/recaptcha/admin/create).
+2. Выберите reCAPTCHA v2 Checkbox.
+3. Запишите `NEXT_PUBLIC_RECAPTCHA_SITE_KEY` и `RECAPTCHA_SECRET` в `.env`.
 
+## 2. Настройка `.env`
+
+Пример (обязательные значения):
+
+```dotenv
+NEXT_PUBLIC_SITE_URL=https://example.com
+WEB_PORT=80
+BOT_SENDER_URL=http://bot-sender:3001
+
+INTERNAL_HMAC_SECRET=replace_with_generated_secret
+RECAPTCHA_SECRET=replace_with_recaptcha_secret
+NEXT_PUBLIC_RECAPTCHA_SITE_KEY=replace_with_recaptcha_site_key
+TELEGRAM_BOT_TOKEN=replace_with_telegram_bot_token
+RECIPIENT_USER_IDS=473779853
+
+ENABLE_DEBUG_ENDPOINTS=false
 ```
-json
-{
-  "company": "Название компании",
-  "name": "Имя контакта",
-  "email": "email@example.com",
-  "phone": "+1234567890",
-  "role": "Роль (опционально)",
-  "message": "Сообщение (опционально)",
-  "captchaToken": "токен_рекапчи",
-  "timestamp": 1234567890,
-  "honeypot": ""  // Должно быть пустым
-}
+
+## 3. Запуск
+
+```bash
+docker compose --env-file .env up -d --build
 ```
 
-## Безопасность
+Проверка состояния:
 
-- Rate limiting: 5 запросов/сек на `/api/submit`
-- HMAC подпись запросов между web и bot-sender
-- Idempotency ключи для предотвращения дубликатов
-- CAPTCHA обязательна
-- Honeypot проверка
-- CSP заголовки
-- Security headers (X-Frame-Options, X-Content-Type-Options, etc.)
+```bash
+docker compose --env-file .env ps
+docker compose --env-file .env logs -f --tail=200
+```
+
+Остановка:
+
+```bash
+docker compose --env-file .env down
+```
+
+Примечание: `docker compose` обычно и так автоматически читает `.env` из корня проекта, но `--env-file .env` делает это явно.
+
+## 4. Безопасность
+
+- Все секреты хранятся только в `.env`.
+- `.env` не должен попадать в Git.
+- `.env` находится в `.dockerignore`, чтобы секреты не попадали в Docker build context и слой образа.
+- `bot-sender` доступен только во внутренней сети compose.
+- Межсервисные запросы подписываются HMAC (`INTERNAL_HMAC_SECRET`).
+- Контейнеры запущены с ограничениями (`no-new-privileges`, `cap_drop: ALL`, `read_only: true`).
+
+## 5. Прод-развёртывание
+
+1. Замените все placeholder-значения в `.env` на реальные.
+2. Откройте на сервере только порт `WEB_PORT`.
+3. Для HTTPS используйте внешний reverse proxy (Caddy/Nginx/Traefik) перед `web`.

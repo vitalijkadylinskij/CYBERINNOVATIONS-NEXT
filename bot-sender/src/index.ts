@@ -3,40 +3,29 @@ import crypto from 'crypto';
 import axios from 'axios';
 
 const app = express();
+app.disable('x-powered-by');
 app.use(express.json({ limit: '10kb' })); // лимит payload
 
-// Читаем секреты из переменных окружения или файлов
-let TELEGRAM_BOT_TOKEN: string | undefined = process.env.TELEGRAM_BOT_TOKEN;
-if (!TELEGRAM_BOT_TOKEN) {
-  try {
-    TELEGRAM_BOT_TOKEN = require('fs').readFileSync('/run/secrets/telegram_bot_token', 'utf-8').trim();
-  } catch (e) {
-    console.error('TELEGRAM_BOT_TOKEN not found in environment or secrets file');
-  }
+function requireEnv(name: string): string {
+  const value = process.env[name]?.trim();
+  if (!value) throw new Error(`Missing required environment variable: ${name}`);
+  return value;
 }
 
-let INTERNAL_HMAC_SECRET: string | undefined = process.env.INTERNAL_HMAC_SECRET;
-if (!INTERNAL_HMAC_SECRET) {
-  try {
-    INTERNAL_HMAC_SECRET = require('fs').readFileSync('/run/secrets/internal_hmac_secret', 'utf-8').trim();
-  } catch (e) {
-    console.error('INTERNAL_HMAC_SECRET not found in environment or secrets file');
-  }
-}
-
-// Ensure secrets are defined for HMAC and Telegram API calls
-const HMAC_SECRET = INTERNAL_HMAC_SECRET || '';
-const BOT_TOKEN = TELEGRAM_BOT_TOKEN || '';
-
-// Список Telegram ID получателей (allowlist) - можно использовать username (без @) или chat_id
-const RECIPIENT_USER_IDS = process.env.RECIPIENT_USER_IDS?.split(',') || ['473779853'];
+const BOT_TOKEN = requireEnv('TELEGRAM_BOT_TOKEN');
+const HMAC_SECRET = requireEnv('INTERNAL_HMAC_SECRET');
+const RECIPIENT_USER_IDS = requireEnv('RECIPIENT_USER_IDS')
+  .split(',')
+  .map((value) => value.trim())
+  .filter(Boolean);
+const ENABLE_DEBUG_ENDPOINTS = process.env.ENABLE_DEBUG_ENDPOINTS === 'true';
 
 // In-memory LRU cache для idempotency ключей
 const idempotencyKeys = new Map<string, number>();
 const IDEMPOTENCY_WINDOW = 5 * 60 * 1000; // 5 минут
 
 // Очистка старых ключей каждые 2 минуты
-setInterval(() => {
+const cleanupInterval = setInterval(() => {
   const now = Date.now();
   for (const [key, timestamp] of idempotencyKeys.entries()) {
     if (now - timestamp > IDEMPOTENCY_WINDOW) {
@@ -44,14 +33,20 @@ setInterval(() => {
     }
   }
 }, 2 * 60 * 1000);
+cleanupInterval.unref();
 
 // Верификация подписи HMAC
 function verifySignature(body: string, timestamp: string, signature: string): boolean {
+  if (!/^[a-f0-9]{64}$/i.test(signature)) return false;
+
   const expected = crypto
     .createHmac('sha256', HMAC_SECRET)
     .update(body + '.' + timestamp)
-    .digest('hex');
-  return expected === signature;
+    .digest();
+
+  const provided = Buffer.from(signature, 'hex');
+  if (provided.length !== expected.length) return false;
+  return crypto.timingSafeEqual(expected, provided);
 }
 
 // Функция отправки сообщения в Telegram с retry
@@ -63,7 +58,7 @@ async function sendToTelegram(message: string): Promise<boolean> {
     try {
       for (const userId of RECIPIENT_USER_IDS) {
         await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-          chat_id: userId.trim(),
+          chat_id: userId,
           text: message,
           parse_mode: 'HTML',
           disable_web_page_preview: true,
@@ -75,27 +70,23 @@ async function sendToTelegram(message: string): Promise<boolean> {
       return true;
     } catch (error: any) {
       console.error(`Attempt ${attempt} failed:`, error.message);
-      
+
       // Если это последняя попытка - выходим с ошибкой
       if (attempt === MAX_RETRIES) {
         throw error;
       }
-      
+
       // Экспоненциальный backoff
       const delay = BASE_DELAY * Math.pow(2, attempt - 1);
       await new Promise(resolve => setTimeout(resolve, delay));
     }
   }
-  
+
   return false;
 }
 
 // Функция удаления webhook при старте
 async function deleteWebhookOnStartup(): Promise<void> {
-  if (!BOT_TOKEN) {
-    console.error('TELEGRAM_BOT_TOKEN is not set, skipping webhook deletion');
-    return;
-  }
   try {
     await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/deleteWebhook`, {
       drop_pending_updates: true,
@@ -114,41 +105,43 @@ app.get('/health', (req, res) => {
   res.status(200).send({ status: 'ok' });
 });
 
-// Debug endpoint для получения chat_id
-app.get('/debug/chat-id/:token', async (req, res) => {
-  const { token } = req.params;
-  
-  // Простой механизм защиты
-  if (!BOT_TOKEN || token !== BOT_TOKEN.slice(0, 10)) {
-    return res.status(401).json({ error: 'Unauthorized' });
-  }
-  
-  try {
-    // Получаем обновления
-    const response = await axios.get(`https://api.telegram.org/bot${BOT_TOKEN}/getUpdates`);
-    const updates = response.data.result;
-    
-    if (updates.length === 0) {
-      return res.json({ 
-        message: 'No updates found. Send /start to your bot first!',
-        instructions: '1. Open your bot in Telegram\n2. Send /start\n3. Wait a few seconds\n4. Refresh this page'
-      });
+if (ENABLE_DEBUG_ENDPOINTS) {
+  // Debug endpoint для получения chat_id
+  app.get('/debug/chat-id/:token', async (req, res) => {
+    const { token } = req.params;
+
+    // Простой механизм защиты
+    if (token !== BOT_TOKEN.slice(0, 10)) {
+      return res.status(401).json({ error: 'Unauthorized' });
     }
-    
-    // Берем последние update
-    const lastUpdate = updates[updates.length - 1];
-    const chat = lastUpdate.message?.chat || lastUpdate.my_chat_member?.chat;
-    
-    res.json({
-      chat_id: chat.id,
-      username: chat.username,
-      first_name: chat.first_name,
-      last_update: lastUpdate
-    });
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
-  }
-});
+
+    try {
+      // Получаем обновления
+      const response = await axios.get(`https://api.telegram.org/bot${BOT_TOKEN}/getUpdates`);
+      const updates = response.data.result;
+
+      if (updates.length === 0) {
+        return res.json({
+          message: 'No updates found. Send /start to your bot first!',
+          instructions: '1. Open your bot in Telegram\n2. Send /start\n3. Wait a few seconds\n4. Refresh this page'
+        });
+      }
+
+      // Берем последние update
+      const lastUpdate = updates[updates.length - 1];
+      const chat = lastUpdate.message?.chat || lastUpdate.my_chat_member?.chat;
+
+      res.json({
+        chat_id: chat.id,
+        username: chat.username,
+        first_name: chat.first_name,
+        last_update: lastUpdate
+      });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+}
 
 // Основной endpoint для отправки
 app.post('/internal/send', async (req, res) => {
@@ -162,8 +155,8 @@ app.post('/internal/send', async (req, res) => {
   }
 
   // Проверка timestamp (окно ±60 секунд)
-  const tsNum = parseInt(timestamp, 10);
-  if (isNaN(tsNum) || Math.abs(Date.now() - tsNum) > 60_000) {
+  const tsNum = Number.parseInt(timestamp, 10);
+  if (Number.isNaN(tsNum) || Math.abs(Date.now() - tsNum) > 60_000) {
     return res.status(401).json({ error: 'Timestamp out of window' });
   }
 
@@ -184,7 +177,7 @@ app.post('/internal/send', async (req, res) => {
 
   // Валидация данных
   const { company, name, email, phone, role, message } = req.body;
-  
+
   if (!company || !name || !email || !phone) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
@@ -200,7 +193,7 @@ app.post('/internal/send', async (req, res) => {
 
   try {
     const success = await sendToTelegram(telegramMessage);
-    
+
     if (success) {
       return res.status(200).json({ ok: true });
     } else {
@@ -217,9 +210,9 @@ function escapeHtml(text: string): string {
   if (!text) return '';
   return text
     .replace(/&/g, '&amp;')
-    .replace(/</g, '<')
-    .replace(/>/g, '>')
-    .replace(/"/g, '"')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
 }
 

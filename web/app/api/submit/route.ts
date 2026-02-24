@@ -1,21 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
-import fs from 'fs';
 
 // Конфигурация
 const BOT_SENDER_URL = process.env.BOT_SENDER_URL || 'http://bot-sender:3001';
-
-// Читаем INTERNAL_HMAC_SECRET из переменной окружения или файла
-let INTERNAL_HMAC_SECRET = process.env.INTERNAL_HMAC_SECRET || '';
-const hmacSecretFile = process.env.INTERNAL_HMAC_SECRET_FILE;
-if (!INTERNAL_HMAC_SECRET && hmacSecretFile) {
-  try {
-    INTERNAL_HMAC_SECRET = fs.readFileSync(hmacSecretFile, 'utf8').trim();
-  } catch (e) {
-    console.error('Failed to read HMAC secret file:', e);
-  }
-}
-
+const INTERNAL_HMAC_SECRET = process.env.INTERNAL_HMAC_SECRET || '';
 const RECAPTCHA_SECRET = process.env.RECAPTCHA_SECRET || '';
 
 // In-memory rate limiting (production используйте Redis)
@@ -84,7 +72,7 @@ function checkFormFillTime(data: any): boolean {
 
 // CAPTCHA проверка
 async function verifyCaptcha(token: string): Promise<boolean> {
-  if (!token || !process.env.RECAPTCHA_SECRET) {
+  if (!token || !RECAPTCHA_SECRET) {
     console.error('No captcha token received or missing RECAPTCHA_SECRET')
     return false
   }
@@ -95,12 +83,11 @@ async function verifyCaptcha(token: string): Promise<boolean> {
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: `secret=${process.env.RECAPTCHA_SECRET}&response=${token}`,
+        body: `secret=${encodeURIComponent(RECAPTCHA_SECRET)}&response=${encodeURIComponent(token)}`,
       }
     )
 
     const data = await response.json()
-    console.log('RECAPTCHA response:', data)
     return data.success === true
   } catch (error) {
     console.error('CAPTCHA verification error:', error)
@@ -124,7 +111,7 @@ function generateRequestId(): string {
 }
 
 export async function POST(request: NextRequest) {
-  if (!INTERNAL_HMAC_SECRET) {
+  if (!INTERNAL_HMAC_SECRET || !RECAPTCHA_SECRET) {
     return NextResponse.json({ error: 'Server misconfiguration' }, { status: 500 });
   }
 
@@ -216,4 +203,3 @@ export async function POST(request: NextRequest) {
 export async function GET() { return NextResponse.json({ error: 'Method not allowed' }, { status: 405 }); }
 export async function PUT() { return NextResponse.json({ error: 'Method not allowed' }, { status: 405 }); }
 export async function DELETE() { return NextResponse.json({ error: 'Method not allowed' }, { status: 405 }); }
-

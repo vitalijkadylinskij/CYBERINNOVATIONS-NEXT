@@ -1,62 +1,34 @@
-
-# Stage 1: Build
-FROM node:20-alpine AS builder
-
+FROM node:25-alpine AS deps
 WORKDIR /app
 
-# Копируем package.json и package-lock.json для кэширования
 COPY package.json package-lock.json ./
+RUN npm ci --no-audit --no-fund
 
-# Используем npm ci для быстрой и детерминистичной установки
-RUN npm ci --prefer-offline --no-audit
+FROM node:25-alpine AS builder
+WORKDIR /app
+ENV NEXT_TELEMETRY_DISABLED=1
 
-# Копируем исходный код
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-
-ARG NEXT_PUBLIC_RECAPTCHA_SITE_KEY
-ARG RECAPTCHA_SECRET
-
-ENV NEXT_PUBLIC_RECAPTCHA_SITE_KEY=$NEXT_PUBLIC_RECAPTCHA_SITE_KEY
-ENV RECAPTCHA_SECRET=$RECAPTCHA_SECRET
-
-# Устанавливаем зависимости для сборки
 RUN npm run build
 
-# Stage 2: Production
-FROM node:20-alpine AS runner
+FROM node:25-alpine AS runner
+WORKDIR /app
 
-# Устанавливаем nginx для статических файлов
-RUN apk add --no-cache nginx
-
-# Создаем не-root пользователя
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
-
-# Создаем необходимые директории для nginx
-RUN mkdir -p /var/lib/nginx/logs /var/lib/nginx/tmp/client_body /var/run && \
-    chown -R nextjs:nodejs /var/lib/nginx /var/run
-
-# Копируем собранные файлы из stage builder
-COPY --from=builder /app/public ./public
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-
-# Копируем nginx конфигурацию
-COPY nginx/nginx.conf /etc/nginx/nginx.conf
-
-# Устанавливаем только production зависимости
-RUN npm install --omit=dev --omit=peer
-
-# Переменные окружения
 ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
 
-# Expose ports: 3000 for Next.js, 80 for nginx
-EXPOSE 3000 80
+RUN addgroup -S nodejs && adduser -S nextjs -G nodejs
 
-# Healthcheck для nginx
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:80/ || exit 1
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
-# Start nginx with daemon off and Next.js
-CMD ["sh", "-c", "nginx -g 'daemon off;' & node server.js"]
+USER nextjs
+EXPOSE 3000
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
+  CMD node -e "fetch('http://127.0.0.1:3000/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+
+CMD ["node", "server.js"]

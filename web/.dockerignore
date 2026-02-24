@@ -1,6 +1,8 @@
 # Dependencies
 node_modules
 .pnpm-store
+.npm
+.yarn
 
 # Build outputs
 .next
@@ -31,17 +33,12 @@ coverage
 .gitignore
 
 # Misc
-*.env.local
-*.env.development.local
-*.env.test.local
-*.env.production.local
+.env
+.env.*
+!.env.example
 
 # Storybook
 .storybook
 
 # TypeScript
 *.tsbuildinfo
-next-env.d.ts
-
-# Secrets (mounted from host in production)
-../secrets

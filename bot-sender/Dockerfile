@@ -1,45 +1,39 @@
-# Stage 1: Build
-FROM node:20-alpine AS builder
-
+FROM node:25-alpine AS deps
 WORKDIR /app
 
-# Копируем зависимости и устанавливаем
-COPY package.json ./
-RUN npm install
+COPY package.json package-lock.json ./
+RUN npm ci --no-audit --no-fund
 
-# Копируем исходный код
-COPY tsconfig.json ./
+FROM node:25-alpine AS builder
+WORKDIR /app
+
+COPY --from=deps /app/node_modules ./node_modules
+COPY package.json package-lock.json tsconfig.json ./
 COPY src ./src
-
-# Компилируем TypeScript
 RUN npm run build
 
-# Stage 2: Production
-FROM node:20-alpine AS runner
-
+FROM node:25-alpine AS prod-deps
 WORKDIR /app
 
-# Создаем не-root пользователя
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 bot
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev --no-audit --no-fund
 
-# Копируем скомпилированные файлы
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./
+FROM node:25-alpine AS runner
+WORKDIR /app
 
-# Переключаемся на не-root пользователя
-USER bot
-
-# Переменные окружения
 ENV NODE_ENV=production
+ENV PORT=3001
 
-# Expose port
+RUN addgroup -S nodejs && adduser -S bot -G nodejs
+
+COPY --from=prod-deps /app/node_modules ./node_modules
+COPY --from=builder /app/dist ./dist
+COPY package.json ./
+
+USER bot
 EXPOSE 3001
 
-# Healthcheck
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:3001/internal/send || exit 1
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
+  CMD node -e "fetch('http://127.0.0.1:3001/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
 
-# Start
 CMD ["node", "dist/index.js"]

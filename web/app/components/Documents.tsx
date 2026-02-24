@@ -104,7 +104,6 @@ export function Documents() {
   // Подключение reCAPTCHA v2
   useEffect(() => {
     (window as any).onCaptchaSuccess = (token: string) => {
-      console.log("Token received:", token);
       setCaptchaToken(token);
     };
   
@@ -185,7 +184,6 @@ export function Documents() {
       setLoading(false);
     }
   };
-  console.log("PROD SITE KEY:", process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY)
 
   return (
     <section className="py-24 relative overflow-hidden" id="documents">

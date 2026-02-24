@@ -1,3 +1,0 @@
-:HL["/CYBERINNOVATIONS-NEXT/_next/static/chunks/b6d5af139fd9d94b.css","style"]
-:HL["/CYBERINNOVATIONS-NEXT/_next/static/media/fabcf92ba1ccea36-s.p.19f28380.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
-0:{"buildId":"wDofPtij7Qbp9uqhT1R5C","tree":{"name":"","paramType":null,"paramKey":"","hasRuntimePrefetch":false,"slots":{"children":{"name":"__PAGE__","paramType":null,"paramKey":"__PAGE__","hasRuntimePrefetch":false,"slots":null,"isRootLayout":false}},"isRootLayout":true},"staleTime":300}

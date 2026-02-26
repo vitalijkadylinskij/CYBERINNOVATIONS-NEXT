@@ -1,36 +1,122 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CYBERINNOVATIONS-NEXT
 
-## Getting Started
+Прод-конфигурация проекта для запуска через `docker compose`:
+- `web` (Next.js, порт контейнера `3000`)
+- `bot-sender` (внутренний сервис отправки в Telegram, порт контейнера `3001`, наружу не публикуется)
 
-First, run the development server:
+## Структура
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```text
+CYBERINNOVATIONS-NEXT/
+├── bot-sender/
+│   ├── src/index.ts
+│   ├── Dockerfile
+│   ├── package.json
+│   └── tsconfig.json
+├── web/
+│   ├── app/
+│   ├── public/
+│   ├── Dockerfile
+│   ├── package.json
+│   └── next.config.mjs
+├── .env.example
+├── docker-compose.yml
+└── README.md
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 1. Подготовка
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Убедитесь, что установлены Docker и Docker Compose Plugin (`docker compose version`).
+2. Создайте файл окружения:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+cp .env.example .env
+chmod 600 .env
+```
 
-## Learn More
+3. Сгенерируйте секрет для внутренней HMAC-подписи:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+openssl rand -hex 32
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Если `openssl` недоступен:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
 
-## Deploy on Vercel
+4. Получите `TELEGRAM_BOT_TOKEN`:
+1. Откройте `@BotFather` в Telegram.
+2. Выполните `/newbot`.
+3. Скопируйте токен вида `1234567890:AA...`.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+5. Получите `RECIPIENT_USER_IDS` (chat id получателей):
+1. Отправьте вашему боту команду `/start`.
+2. Выполните:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+export TELEGRAM_BOT_TOKEN='ваш_токен'
+curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates" | jq -r '.result[]?.message?.chat?.id' | sort -u
+```
+
+3. Вставьте одно или несколько значений в `.env` через запятую.
+
+6. Получите reCAPTCHA ключи:
+1. Создайте сайт в [Google reCAPTCHA Admin](https://www.google.com/recaptcha/admin/create).
+2. Выберите reCAPTCHA v2 Checkbox.
+3. Запишите `NEXT_PUBLIC_RECAPTCHA_SITE_KEY` и `RECAPTCHA_SECRET` в `.env`.
+
+## 2. Настройка `.env`
+
+Пример (обязательные значения):
+
+```dotenv
+NEXT_PUBLIC_SITE_URL=https://example.com
+WEB_PORT=80
+BOT_SENDER_URL=http://bot-sender:3001
+
+INTERNAL_HMAC_SECRET=replace_with_generated_secret
+RECAPTCHA_SECRET=replace_with_recaptcha_secret
+NEXT_PUBLIC_RECAPTCHA_SITE_KEY=replace_with_recaptcha_site_key
+TELEGRAM_BOT_TOKEN=replace_with_telegram_bot_token
+RECIPIENT_USER_IDS=473779853
+
+ENABLE_DEBUG_ENDPOINTS=false
+```
+
+## 3. Запуск
+
+```bash
+docker compose --env-file .env up -d --build
+```
+
+Проверка состояния:
+
+```bash
+docker compose --env-file .env ps
+docker compose --env-file .env logs -f --tail=200
+```
+
+Остановка:
+
+```bash
+docker compose --env-file .env down
+```
+
+Примечание: `docker compose` обычно и так автоматически читает `.env` из корня проекта, но `--env-file .env` делает это явно.
+
+## 4. Безопасность
+
+- Все секреты хранятся только в `.env`.
+- `.env` не должен попадать в Git.
+- `.env` находится в `.dockerignore`, чтобы секреты не попадали в Docker build context и слой образа.
+- `bot-sender` доступен только во внутренней сети compose.
+- Межсервисные запросы подписываются HMAC (`INTERNAL_HMAC_SECRET`).
+- Контейнеры запущены с ограничениями (`no-new-privileges`, `cap_drop: ALL`, `read_only: true`).
+
+## 5. Прод-развёртывание
+
+1. Замените все placeholder-значения в `.env` на реальные.
+2. Откройте на сервере только порт `WEB_PORT`.
+3. Для HTTPS используйте внешний reverse proxy (Caddy/Nginx/Traefik) перед `web`.

@@ -8,7 +8,7 @@ import {GoalsAndAccents} from "./components/GoalsAndAccents";
 import { Challenges } from './components/Challenges';
 import { TargetAudience } from './components/TargetAudience';
 import { Priorities } from './components/Priorities';
-import { Team } from './components/Team';
+// import { Team } from './components/Team'; // Скрыт блок "люди, которые отвечают за результат"
 import { Achievements } from './components/Achievements';
 import { Documents } from './components/Documents';
 import { Footer } from './components/Footer';
@@ -26,7 +26,7 @@ export default function Home() {
         <TargetAudience />
         <TechnologyDirections activeKey={activeCommittee} onActiveKeyChange={setActiveCommittee} />
         <Priorities />
-        <Team />
+        {/* <Team /> */} {/* Скрыт блок "люди, которые отвечают за результат" */}
         <Achievements />
         <Documents />
       </main>

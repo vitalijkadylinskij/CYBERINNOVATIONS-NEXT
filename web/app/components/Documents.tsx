@@ -24,39 +24,77 @@ interface Document {
 const documents: Document[] = [
   {
     title: 'Устав Ассоциации',
-    description: 'Миссия, структура и принципы работы',
+    description: 'Миссия, структура и принципы работы Ассоциации',
     icon: BookOpen,
-    size: 'публикация готовится',
-    available: false,
+    size: 'PDF',
+    href: 'materials/Устав.pdf',
+    available: true,
   },
   {
     title: 'Свидетельство о регистрации',
     description: 'Официальное подтверждение государственной регистрации',
     icon: Award,
-    size: 'публикация готовится',
-    available: false,
+    size: 'PDF',
+    href: 'materials/Свидетельство.pdf',
+    available: true,
   },
   {
     title: 'Положение о членстве',
     description: 'Условия, роли и порядок вступления для юридических лиц',
     icon: FileCheck,
-    size: 'публикация готовится',
-    available: false,
-  },
-  {
-    title: 'Презентация Ассоциации (PDF)',
-    description: 'Цели, направления, приоритеты и форматы взаимодействия',
-    icon: FileText,
-    size: '2.3 MB',
-    href: 'materials/assosiation-3.pdf',
+    size: 'PDF',
+    href: 'materials/Положение_о_членстве .pdf',
     available: true,
   },
   {
-    title: 'Брендбук (PPTX)',
-    description: 'Фирменный стиль и правила использования материалов',
+    title: 'Образец заявления о вступлении',
+    description: 'Форма заявления на вступление в Ассоциацию',
     icon: FileText,
-    size: '24.9 MB',
-    href: 'materials/brandbook.pptx',
+    size: 'DOCX',
+    href: 'materials/obrazec_zayavleniya_2026.docx',
+    available: true,
+  },
+  {
+    title: 'Анкета участника',
+    description: 'Анкета для компаний и инициатив, желающих подключиться',
+    icon: FileText,
+    size: 'DOC',
+    href: 'materials/anketa_forma.doc',
+    available: true,
+  },
+]
+
+const mouDocuments: Document[] = [
+  {
+    title: 'Меморандум о сотрудничестве с BRICS Pay',
+    description: 'Партнёрство по развитию цифровых платёжных решений и трансграничных сервисов.',
+    icon: FileText,
+    size: 'PDF',
+    href: 'materials/BRICS_pay.pdf',
+    available: true,
+  },
+  {
+    title: 'Меморандум о сотрудничестве с НЦОД',
+    description: 'Совместные инициативы по развитию национальной вычислительной инфраструктуры.',
+    icon: FileText,
+    size: 'PDF',
+    href: 'materials/NCOD.pdf',
+    available: true,
+  },
+  {
+    title: 'Меморандум о сотрудничестве с PLUS',
+    description: 'Кооперация в области финтех-решений и отраслевой экспертизы.',
+    icon: FileText,
+    size: 'PDF',
+    href: 'materials/PLUS.pdf',
+    available: true,
+  },
+  {
+    title: 'Меморандум о сотрудничестве с VAMP',
+    description: 'Партнёрство по развитию инновационных проектов и пилотов.',
+    icon: FileText,
+    size: 'PDF',
+    href: 'materials/VAMP.pdf',
     available: true,
   },
 ]
@@ -100,29 +138,34 @@ export function Documents() {
   const [error, setError] = useState<string | null>(null)
   const [formStartTime] = useState(Date.now())
   const [captchaToken, setCaptchaToken] = useState<string>('')
+  const [showMou, setShowMou] = useState(false)
 
-  // Подключение reCAPTCHA v2
+  const isCaptchaEnabled = !!process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY
+
+  // Подключение reCAPTCHA v2 (если настроен sitekey)
   useEffect(() => {
-    (window as any).onCaptchaSuccess = (token: string) => {
-      setCaptchaToken(token);
-    };
-  
-    const script = document.createElement("script");
-    script.src = "https://www.google.com/recaptcha/api.js";
-    script.async = true;
-    script.defer = true;
-  
-    document.body.appendChild(script);
-  
+    if (!isCaptchaEnabled) return
+
+    ;(window as any).onCaptchaSuccess = (token: string) => {
+      setCaptchaToken(token)
+    }
+
+    const script = document.createElement('script')
+    script.src = 'https://www.google.com/recaptcha/api.js'
+    script.async = true
+    script.defer = true
+
+    document.body.appendChild(script)
+
     return () => {
-      document.body.removeChild(script);
-    };
-  }, []);
+      document.body.removeChild(script)
+    }
+  }, [isCaptchaEnabled])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!captchaToken) {
+    if (isCaptchaEnabled && !captchaToken) {
       setError("Пожалуйста, пройдите CAPTCHA");
       return;
     }
@@ -210,7 +253,7 @@ export function Documents() {
           {/* Документы */}
           <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
             <h3 className="text-2xl font-bold text-[#151515] font-bebas tracking-wide mb-6">Документация</h3>
-            <div className="space-y-4">
+            <div className="space-y-4 mb-8">
               {documents.map((doc, index) => {
                 const Icon = doc.icon
                 const content = (
@@ -239,6 +282,72 @@ export function Documents() {
                 )
               })}
             </div>
+
+            {mouDocuments.length > 0 && (
+              <div className="mt-10 flex justify-center">
+                <div className="w-full max-w-xl">
+                  <button
+                    type="button"
+                    onClick={() => setShowMou((prev) => !prev)}
+                    className="w-full flex items-center justify-between gap-3 rounded-2xl bg-white border border-[#151515]/12 px-5 py-3 text-sm font-semibold text-[#151515] shadow-sm hover:border-[#5F68A5]/40 hover:shadow-md transition-all"
+                  >
+                    <div className="text-left">
+                      <div className="font-bebas text-lg leading-none">Меморандумы о сотрудничестве</div>
+                      <p className="text-[11px] text-[#151515]/60 mt-1">
+                        Формализованные соглашения с ключевыми партнёрами о совместной работе и развитии проектов.
+                      </p>
+                    </div>
+                    <span className="text-xs text-[#151515]/60">
+                      {showMou ? 'Скрыть' : 'Показать'}
+                    </span>
+                  </button>
+
+                  {showMou && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 8 }}
+                      className="mt-4 space-y-3"
+                    >
+                      {mouDocuments.map((doc, index) => {
+                        const Icon = doc.icon
+                        const content = (
+                          <div className="flex items-center gap-4 p-4 rounded-xl border bg-white border-[#151515]/10 hover:border-[#5F68A5]/30 hover:shadow-md transition-all cursor-pointer">
+                            <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[#5F68A5]/10 text-[#5F68A5]">
+                              <Icon className="w-5 h-5" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h5 className="font-semibold text-[#151515] mb-0.5 text-sm">{doc.title}</h5>
+                              <p className="text-xs text-[#151515]/55">{doc.description}</p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-[#151515]/45 hidden sm:block">{doc.size}</span>
+                              <div className="w-9 h-9 rounded-full flex items-center justify-center bg-[#F3F4E9] text-[#5F68A5]">
+                                <Download className="w-4 h-4" />
+                              </div>
+                            </div>
+                          </div>
+                        )
+
+                        return (
+                          <motion.div
+                            key={index}
+                            initial={{ opacity: 0, y: 12 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: index * 0.05 }}
+                          >
+                            <a href={doc.href} target="_blank" rel="noopener noreferrer" className="block group">
+                              {content}
+                            </a>
+                          </motion.div>
+                        )
+                      })}
+                    </motion.div>
+                  )}
+                </div>
+              </div>
+            )}
           </motion.div>
 
           {/* Шаги */}
@@ -339,12 +448,14 @@ export function Documents() {
 
                     <Textarea placeholder="Сообщение (необязательно)" value={formData.message} onChange={(e) => setFormData({ ...formData, message: e.target.value })} className="bg-white/10 border-white/10 text-[#F3F4E9] placeholder:text-[#F3F4E9]/45 focus:border-[#5F891D]" rows={4} />
 
-                    {/* reCAPTCHA */}
-                    <div
-                    className="g-recaptcha"
-                    data-sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
-                    data-callback="onCaptchaSuccess"
-/>
+                    {/* reCAPTCHA (если настроен sitekey) */}
+                    {isCaptchaEnabled && (
+                      <div
+                        className="g-recaptcha"
+                        data-sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+                        data-callback="onCaptchaSuccess"
+                      />
+                    )}
 
                     {error && <p className="text-[#F8911D] text-sm">{error}</p>}
 

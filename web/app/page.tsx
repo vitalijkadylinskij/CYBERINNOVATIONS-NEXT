@@ -26,7 +26,7 @@ export default function Home() {
         <TargetAudience />
         <TechnologyDirections activeKey={activeCommittee} onActiveKeyChange={setActiveCommittee} />
         <Priorities />
-        <Team />
+        {/*<Team />*/}
         <Achievements />
         <Documents />
       </main>

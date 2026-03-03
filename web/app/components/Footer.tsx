@@ -129,7 +129,7 @@ export function Footer() {
                     className="flex items-start gap-3 text-[#F3F4E9]/62 hover:text-[#5F891D] transition-colors"
                   >
                     <Mail className="w-4 h-4 mt-1" />
-                    <span className="text-sm">info@cyberinnovations.by</span>
+                    <span className="text-sm">cyb.inbust@gmail.com</span>
                   </a>
                 </li>
                 <li>
@@ -138,12 +138,12 @@ export function Footer() {
                     className="flex items-start gap-3 text-[#F3F4E9]/62 hover:text-[#5F891D] transition-colors"
                   >
                     <Phone className="w-4 h-4 mt-1" />
-                    <span className="text-sm">+375 (XX) XXX-XX-XX</span>
+                    <span className="text-sm">+375292205718</span>
                   </a>
                 </li>
                 <li className="flex items-start gap-3 text-[#F3F4E9]/62">
                   <MapPin className="w-4 h-4 mt-1" />
-                  <span className="text-sm">Минск, Республика Беларусь</span>
+                  <span className="text-sm">Республика Беларусь, 220062, город Минск, улица Тимирязева, д. 121, корп.3, пом. 39/1</span>
                 </li>
               </ul>
             </div>

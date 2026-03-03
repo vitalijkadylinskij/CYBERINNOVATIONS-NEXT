@@ -1,0 +1,529 @@
+{
+  "common": {
+    "apply": "Submit Application",
+    "learnMore": "Learn More",
+    "becomeMember": "Become a Member",
+    "directions": "Directions",
+    "activeCommittee": "Active committee:",
+    "year": "year",
+    "keyPoints": {
+      "investments": "investments",
+      "directions": "directions",
+      "partners": "partners"
+    }
+  },
+  "header": {
+    "about": "About",
+    "directions": "Directions",
+    "membership": "Membership",
+    "projects": "Projects",
+    "contacts": "Contacts",
+    "apply": "Submit Application",
+    "closeMenu": "Close menu",
+    "openMenu": "Open menu",
+    "copyright": "Cyber Innovations"
+  },
+  "hero": {
+    "country": "Republic of Belarus",
+    "titleLine1": "Association",
+    "titleLine2": "Digital",
+    "titleLine3": "Technologies",
+    "description": "We unite innovation leaders to accelerate technology implementation in the real sector and government — from requirements and standards to pilots, infrastructure, and scaling.",
+    "becomeMember": "Become a Member",
+    "learnMore": "Learn More",
+    "directions": "Directions",
+    "techDirections": {
+      "ai": {
+        "title": "Neural Networks",
+        "badge": "AI & ML"
+      },
+      "blockchain": {
+        "title": "Distributed Ledgers",
+        "badge": "Blockchain"
+      },
+      "iot": {
+        "title": "Internet of Things",
+        "badge": "IoT"
+      },
+      "cybersecurity": {
+        "title": "Cybersecurity",
+        "badge": "Cybersecurity"
+      },
+      "microelectronics": {
+        "title": "Microelectronics",
+        "badge": "Robotics"
+      },
+      "cloud": {
+        "title": "Computing Infrastructure",
+        "badge": "Cloud"
+      },
+      "energy": {
+        "title": "Energy Infrastructure",
+        "badge": "Energy"
+      },
+      "humanCapital": {
+        "title": "Personnel Training",
+        "badge": "Human Capital"
+      }
+    }
+  },
+  "goals": {
+    "sectionTitle": "Goals and Accents",
+    "title": "Association Goals",
+    "subtitle": "\"Cyber Innovations\"",
+    "description": "We unite innovation leaders to accelerate technology implementation in the real sector and government: from requirements and standards — to pilots, infrastructure, and scaling.",
+    "keyGoals": "Key Goals",
+    "howWeWork": "How We Work",
+    "howWeWorkNote": "Leave a request — we'll forward it to the relevant subcommittee, clarify the details, and propose a format: working group, pilot, agreement, or membership in the Association.",
+    "goToApplication": "Go to Application",
+    "goalsList": {
+      "0": "Unite technology companies, industry customers, and experts around digital economy priorities of Belarus.",
+      "1": "Form requirements, standards, and initiatives for convergent technology implementation in industries.",
+      "2": "Launch pilots and support solution replication: from request to implementation and effect assessment.",
+      "3": "Develop core circuits: computing infrastructure, investment mechanisms, and personnel training."
+    },
+    "accentsList": {
+      "0": "We work through subcommittees and project groups: gathering request, expertise, and implementation plan.",
+      "1": "We connect participants to projects and resources: pilot sites, partnerships, financing, international connections."
+    },
+    "roles": {
+      "company": {
+        "role": "Company from the relevant field",
+        "action": "Apply for membership/partnership. We'll connect you with subcommittees, pilots, and projects for your industry."
+      },
+      "government": {
+        "role": "Government representative",
+        "action": "Submit a request for expertise, solution selection, or pilot launch for your department/industry tasks."
+      },
+      "partner": {
+        "role": "Related or partner organization",
+        "action": "Request cooperation: joint initiatives, agreements, events, expertise, and resource exchange."
+      },
+      "media": {
+        "role": "Media representative",
+        "action": "Request a comment, project briefing, or contact for interview/public speaking."
+      },
+      "expert": {
+        "role": "Expert",
+        "action": "Apply to expert groups: standards, analytics, project evaluation, implementation methodologies."
+      },
+      "volunteer": {
+        "role": "Volunteer",
+        "action": "Apply to participate in events and organizational support of Association initiatives."
+      }
+    }
+  },
+  "challenges": {
+    "sectionTitle": "Key Challenges",
+    "title": "Technological Sovereignty",
+    "subtitle": "as a national task",
+    "keyThesis": "Key Thesis",
+    "thesisText": "5 areas of Association work: from translating Strategy into concrete projects to standard implementation mechanics.",
+    "challenges": {
+      "computing": {
+        "title": "Computational Sovereignty and Infrastructure Independence",
+        "shortDesc": "We create access to computing power and infrastructure so national projects can scale within the country.",
+        "fullDesc": "Geopolitical instability dictates new rules: access to computing power today determines leadership tomorrow. To avoid technological lag, we initiate the creation of accessible IT infrastructure necessary for scaling AI projects in Belarus. The Association acts as a bridge between government, business, and society, ensuring transparency in innovation implementation."
+      },
+      "intellectual": {
+        "title": "Intellectual Sovereignty and Process Maturity",
+        "shortDesc": "We address the deficit of competencies and management practices: methodologies, standards, project discipline for national-scale initiatives.",
+        "fullDesc": "Technologies are just tools, with 100% effectiveness depending on the competencies of those who manage them. Today, the shortage of qualified personnel and lack of established project management processes for national-scale initiatives are becoming the main barriers to development."
+      },
+      "product": {
+        "title": "Product Sovereignty and Capitalization of National Expertise",
+        "shortDesc": "We help turn developments into products: pilots with customers, industry testing, preparation for scaling and export.",
+        "fullDesc": "The future of Belarus's digital economy depends on our ability to transform the service model into a product model while keeping intellectual capital in the country. The Association acts as a consolidator of promising developments and startups."
+      },
+      "investment": {
+        "title": "Investment Ecosystem and Capital Consolidation",
+        "shortDesc": "We set up transparent selection and funding mechanisms for priority projects and shared technological infrastructure.",
+        "fullDesc": "Belarusian innovations need a powerful financial leap to enter international markets. The Association becomes a hub for attracting private and government investments."
+      },
+      "multidisciplinary": {
+        "title": "Multidisciplinary Synthesis: Digital Sovereignty Architecture",
+        "shortDesc": "We connect industries and technologies into a single loop: compatibility, security, standards, and cooperation without excessive bureaucracy.",
+        "fullDesc": "Creating a modern economy is impossible without seamless integration of a whole spectrum of domains: from microelectronics, robotics, and energy infrastructure to neural networks, cloud computing, and blockchain."
+      }
+    }
+  },
+  "audience": {
+    "sectionTitle": "Trusted Partnership",
+    "title": "Government, Business, and Science",
+    "subtitle": "unified coordination",
+    "description": "Unified coordination: government requests, business solutions, and academic expertise — in working groups and projects.",
+    "associationTitle": "Association",
+    "associationSubtitle": "\"Cyber Innovations\"",
+    "associationDescription": "Coordination platform: expertise, working groups, pilots, standards, and personnel development.",
+    "activeSector": "Active sector:",
+    "partnersTitle": "Partners and Agreements",
+    "connectText": "We connect to working groups and projects through a single interaction circuit.",
+    "groups": {
+      "government": {
+        "shortLabel": "Government",
+        "title": "For Government Bodies",
+        "subtitle": "Strategic Expertise",
+        "benefits": [
+          "Expert circuit for regulatory initiatives, standards, and implementation methodologies.",
+          "Selection of solutions and teams for pilots in government infrastructure and priority industries.",
+          "Requirements coordination platform: government ↔ business ↔ science.",
+          "Single window for industry communications and international interaction."
+        ]
+      },
+      "academy": {
+        "shortLabel": "Academy",
+        "title": "For Academic Community",
+        "subtitle": "From Theory to Practice",
+        "benefits": [
+          "R&D implementation channel to real sector: projects, customers, partners.",
+          "Joint programs with industry: applied research and pilots.",
+          "Young specialist support: mentors, internships, industrial tasks.",
+          "International connections: partnerships and cooperation with research centers."
+        ]
+      },
+      "business": {
+        "shortLabel": "Business",
+        "title": "For Business",
+        "subtitle": "Scaling and Influence",
+        "benefits": [
+          "Influence on market rules and standards through working groups and expertise.",
+          "Access to pilot sites and industry customers for solution testing.",
+          "Resource attraction: partnership financing and investment contacts.",
+          "Scaling through cooperation within the ecosystem."
+        ]
+      },
+      "startups": {
+        "shortLabel": "Startups",
+        "title": "For Startups and Investors",
+        "subtitle": "Capital Acceleration",
+        "benefits": [
+          "Fast project expertise and preparation for pilot/deal.",
+          "Access to customers and testing points within the national ecosystem.",
+          "Connection to accelerators and international contacts.",
+          "Smart Money: mentorship on strategy, sales, and scaling."
+        ]
+      },
+      "talents": {
+        "shortLabel": "Talents",
+        "title": "For Students and Specialists",
+        "subtitle": "Springboard to Industry",
+        "benefits": [
+          "Internships and participation in real projects of Association members.",
+          "Mentorship and career counseling from industry leaders.",
+          "Portfolio building through contests, hackathons, and applied tasks.",
+          "Professional networking and access to events."
+        ]
+      }
+    }
+  },
+  "directions": {
+    "sectionTitle": "Association Subcommittees",
+    "title": "8 Directions",
+    "subtitle": "of Convergent Technologies",
+    "description": "Select a direction — description and connection methods always remain visible. On mobile, details open over content.",
+    "selectDirection": "Select a direction on the left — detailed description will appear here.",
+    "howToConnect": "How to Connect",
+    "connectSteps": [
+      "Submit a request to the relevant subcommittee and determine the participation format.",
+      "Connect to a pilot/project with an industry customer or government body.",
+      "Formalize partnership/membership for access to resources and cooperation."
+    ],
+    "closeDetails": "Close details",
+    "techDirections": {
+      "ai": {
+        "title": "Neural Networks",
+        "subtitle": "AI",
+        "description": "The Association promotes AI implementation in the real sector, providing businesses with access to government datasets for model training."
+      },
+      "blockchain": {
+        "title": "Distributed Ledgers",
+        "subtitle": "Blockchain",
+        "description": "We form a transparent legal environment for blockchain projects, ensuring business protection when working with digital assets."
+      },
+      "iot": {
+        "title": "Internet of Things",
+        "subtitle": "IoT",
+        "description": "We create a 'green corridor' for IoT solution testing, providing startups and companies with access to industrial and urban infrastructure."
+      },
+      "cybersecurity": {
+        "title": "Cybersecurity",
+        "subtitle": "Cybersecurity",
+        "description": "We develop unified critical infrastructure protection standards, ensuring the government a high level of national security."
+      },
+      "microelectronics": {
+        "title": "Microelectronics and Robotics",
+        "subtitle": "Microelectronics & Robotics",
+        "description": "We connect fundamental science with real production to create domestic component base."
+      },
+      "cloud": {
+        "title": "Computing Infrastructure",
+        "subtitle": "Cloud Computing",
+        "description": "We provide collective access for Association members to powerful computing resources, reducing business costs for data storage and processing."
+      },
+      "energy": {
+        "title": "Energy Infrastructure",
+        "subtitle": "Energy",
+        "description": "We focus on IT sector energy security, implementing Smart Grid and renewable technologies."
+      },
+      "humanCapital": {
+        "title": "Personnel Training",
+        "subtitle": "Human Capital",
+        "description": "We prepare specialists for real tasks from industries and government customers: joint programs with universities, internships at Association members."
+      }
+    }
+  },
+  "priorities": {
+    "sectionTitle": "Strategic Priorities",
+    "title": "From 2026 Start",
+    "subtitle": "to 2030 Leadership",
+    "year2026": "2026 Priorities",
+    "year2030": "2030 Vision",
+    "subtitle2026": "Infrastructure and Financial Start",
+    "subtitle2030": "Global Technological Leadership",
+    "items2026": {
+      "capitalization": {
+        "title": "Innovation Capitalization",
+        "description": "We launch partnership financing and industry fund with target volume of $200+ million to support national startups and tech projects.",
+        "metric": "$200+ million"
+      },
+      "computing": {
+        "title": "Computational Sovereignty",
+        "description": "We create Belarus AI Data Center under the Association's auspices — access to facilities for development, pilots, and attracting international projects."
+      },
+      "global": {
+        "title": "Global Dialogue",
+        "description": "We hold an international conference on convergent technologies as a gathering point for experts, customers, and investors.",
+        "metric": "2026"
+      }
+    },
+    "items2030": {
+      "lift": {
+        "title": "Sustainable Investment Lift",
+        "description": "System of stable investment flow into national projects at $300+ million annually.",
+        "metric": "$300+ million/year"
+      },
+      "unicorns": {
+        "title": "Unicorn Factory",
+        "description": "Complex of conditions — infrastructure, capital, markets — to bring at least 5 hi-tech companies to world level annually.",
+        "metric": "5 companies/year"
+      },
+      "decentralization": {
+        "title": "Intellectual Decentralization",
+        "description": "Continuous influx of qualified personnel to regions and development of regional centers as technology growth points."
+      },
+      "scaling": {
+        "title": "Ultra-Fast Scaling Cycle",
+        "description": "Chain 'idea → pilot → market' allowing solutions to reach global markets in less than a year.",
+        "metric": "< 1 year"
+      }
+    },
+    "focusArea": "Focus Area"
+  },
+  "team": {
+    "sectionTitle": "Association Experts",
+    "title": "People Who Deliver",
+    "subtitle": "Results",
+    "description": "Management and key track leads are published here — so partners understand who makes decisions, runs projects, and where to turn for expertise, pilots, and participation.",
+    "members": {
+      "chairman": {
+        "role": "Chairman of the Association",
+        "description": "Coordination of interaction with government bodies and development of inter-industry partnership."
+      },
+      "tech": {
+        "role": "Head of Technology Subcommittees",
+        "description": "Coordination of technology subcommittees: AI, blockchain, IoT, cybersecurity, microelectronics and robotics, computing infrastructure, energy, personnel training."
+      },
+      "investment": {
+        "role": "Head of Investment Track",
+        "description": "Development of partnership financing program and support of investment initiatives."
+      },
+      "education": {
+        "role": "Head of Educational and International Programs",
+        "description": "Development of personnel reserve and international agenda of the Association."
+      }
+    }
+  },
+  "achievements": {
+    "sectionTitle": "Achievements and Projects",
+    "title": "Real Steps in Ecosystem Development",
+    "keyActivity": "Key Activity",
+    "currentProjects": "Current Projects",
+    "documentsLink": "Documents, Regulations, and Project Materials",
+    "achievements": {
+      "dataCenter": {
+        "title": "Working Sessions for BELARUS AI DATA CENTER Launch",
+        "description": "Together with government, business, and experts, we are developing architecture, requirements, and access model for computing infrastructure for national-scale projects.",
+        "date": "2025-2026",
+        "location": "Minsk, Republic of Belarus",
+        "participants": "Relevant working groups",
+        "highlight": "Key Project"
+      },
+      "memorandum": {
+        "title": "Memoranda and Partnership Agreements",
+        "description": "We develop a network of national and international partners for joint projects, pilots, and industry cooperation.",
+        "date": "Regularly",
+        "location": "Belarus / International venues"
+      },
+      "roundtable": {
+        "title": "Round Tables on Regulatory and Investment Agenda",
+        "description": "We coordinate priorities, requirements, and implementation mechanics: government, science, investors, and technology companies.",
+        "date": "Quarterly",
+        "location": "Minsk, Republic of Belarus",
+        "participants": "Experts and Association members"
+      }
+    },
+    "projects": {
+      "dataCenter": {
+        "title": "BELARUS AI DATA CENTER",
+        "status": "Infrastructure Design",
+        "description": "We create a national circuit of computing power for AI projects and applied research.",
+        "deadline": "Q2 2026 (plan)"
+      },
+      "funding": {
+        "title": "Partnership Financing",
+        "status": "Launch Preparation",
+        "description": "Project selection and funding mechanics: expertise, criteria, support up to pilot and scaling.",
+        "deadline": "Q4 2026 (plan)"
+      },
+      "conference": {
+        "title": "International Conference",
+        "status": "Business Program Formation",
+        "description": "Platform on convergent technologies: implementation cases, standards, investments, export.",
+        "deadline": "Q3 2026 (plan)"
+      },
+      "ecosystem": {
+        "title": "General Participant Ecosystem",
+        "status": "MVP Project",
+        "description": "Unified environment for communication and cooperation: working groups, requests, projects, activity calendar.",
+        "deadline": "Q1 2026 (plan)"
+      }
+    },
+    "deadline": "Deadline:"
+  },
+  "documents": {
+    "sectionTitle": "Documents and Membership",
+    "title": "Materials Package",
+    "subtitle": "and Cooperation Terms",
+    "documentsTitle": "Documentation",
+    "membershipTitle": "Membership Process",
+    "docs": {
+      "charter": {
+        "title": "Association Charter",
+        "description": "Mission, structure, and operating principles",
+        "size": "publication pending"
+      },
+      "registration": {
+        "title": "Registration Certificate",
+        "description": "Official confirmation of state registration",
+        "size": "publication pending"
+      },
+      "membership": {
+        "title": "Membership Regulations",
+        "description": "Terms, roles, and admission procedure for legal entities",
+        "size": "publication pending"
+      },
+      "presentation": {
+        "title": "Association Presentation (PDF)",
+        "description": "Goals, directions, priorities, and cooperation formats",
+        "size": "2.3 MB"
+      },
+      "brandbook": {
+        "title": "Brandbook (PPTX)",
+        "description": "Corporate identity and materials usage guidelines",
+        "size": "24.9 MB"
+      }
+    },
+    "steps": {
+      "step1": {
+        "title": "Review Documents",
+        "description": "Study the mission, directions, and participation format."
+      },
+      "step2": {
+        "title": "Fill Out Application",
+        "description": "Select a role and send information about your organization or initiative."
+      },
+      "step3": {
+        "title": "Expert Review",
+        "description": "The relevant group analyzes the request and proposes a cooperation format."
+      },
+      "step4": {
+        "title": "Connect to Ecosystem",
+        "description": "We agree on a work plan and connect you to projects/subcommittees."
+      }
+    },
+    "form": {
+      "title": "Cooperation Application",
+      "description": "Leave your contacts and briefly describe your request — we'll propose a format: membership, partnership, expert development, or project participation.",
+      "formOptions": [
+        "Membership and partnership for technology companies",
+        "Expert requests from government bodies and partners",
+        "Connection to Association projects and events"
+      ],
+      "submitted": "Request Sent",
+      "submittedDescription": "Role: {role}. We will contact you with a proposal on the cooperation format.",
+      "placeholders": {
+        "company": "Organization / Company *",
+        "name": "Contact Person *",
+        "email": "Email *",
+        "phone": "Phone *",
+        "message": "Message (optional)"
+      },
+      "roles": {
+        "company": "Company (membership/partnership)",
+        "government": "Government Body",
+        "partner": "Related/Partner Organization",
+        "media": "Media",
+        "expert": "Expert",
+        "volunteer": "Volunteer"
+      },
+      "submit": "Submit",
+      "sending": "Sending...",
+      "captchaError": "Please complete CAPTCHA",
+      "error": "An error occurred while sending"
+    }
+  },
+  "footer": {
+    "cta": {
+      "title": "Ready for Joint Initiatives?",
+      "description": "Leave an application — we'll connect you to projects, subcommittees, and partner initiatives."
+    },
+    "navigation": "Navigation",
+    "techDirections": "Directions",
+    "contacts": "Contacts",
+    "apply": "Submit Application",
+    "navLinks": {
+      "about": "About",
+      "goals": "Goals",
+      "challenges": "Challenges",
+      "audience": "Audience",
+      "subcommittees": "Subcommittees",
+      "priorities": "Priorities",
+      "projects": "Projects",
+      "documents": "Documents",
+      "application": "Application"
+    },
+    "techLinks": {
+      "ai": "Neural Networks (AI)",
+      "blockchain": "Distributed Ledgers (Blockchain)",
+      "iot": "Internet of Things (IoT)",
+      "cybersecurity": "Cybersecurity",
+      "microelectronics": "Microelectronics and Robotics",
+      "cloud": "Cloud Infrastructure",
+      "energy": "Energy Infrastructure"
+    },
+    "presentation": "Open Association Presentation",
+    "email": "info@cyberinnovations.by",
+    "phone": "+375 (XX) XXX-XX-XX",
+    "address": "Republic of Belarus, 220062, Minsk, Timiryazev Street, 2121, building 3, office 39/1",
+    "copyright": "Association \"Cyber Innovations\". All rights reserved.",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfUse": "Terms of Use"
+  },
+  "metadata": {
+    "title": "Cyber Innovation — IT Solutions and Digital Transformation",
+    "titleTemplate": "%s | Cyber Innovation",
+    "description": "Cyber Innovation — IT solutions development, cybersecurity, and innovative technology implementation for business.",
+    "ogTitle": "Cyber Innovation — IT Solutions of New Generation",
+    "ogDescription": "Development, cybersecurity, and innovative technologies for business."
+  }
+}

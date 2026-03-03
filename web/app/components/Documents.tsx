@@ -5,6 +5,7 @@ import { motion } from "framer-motion"
 import { FileText, Download, Send, CircleCheck, ArrowRight, BookOpen, Award, FileCheck } from 'lucide-react'
 import { Input } from './ui/input'
 import { Textarea } from './ui/textarea'
+import { useTranslations } from "next-intl"
 
 declare global {
   interface Window {
@@ -12,80 +13,40 @@ declare global {
   }
 }
 
+type DocKey = 'charter' | 'registration' | 'membership' | 'presentation' | 'brandbook';
+
 interface Document {
-  title: string
-  description: string
-  icon: React.ElementType
-  size?: string
-  href?: string
-  available: boolean
+  key: DocKey;
+  icon: React.ElementType;
+  href?: string;
+  available: boolean;
 }
 
+// Variables: keep form state, documents data, icons
 const documents: Document[] = [
-  {
-    title: 'Устав Ассоциации',
-    description: 'Миссия, структура и принципы работы',
-    icon: BookOpen,
-    size: 'публикация готовится',
-    available: false,
-  },
-  {
-    title: 'Свидетельство о регистрации',
-    description: 'Официальное подтверждение государственной регистрации',
-    icon: Award,
-    size: 'публикация готовится',
-    available: false,
-  },
-  {
-    title: 'Положение о членстве',
-    description: 'Условия, роли и порядок вступления для юридических лиц',
-    icon: FileCheck,
-    size: 'публикация готовится',
-    available: false,
-  },
-  {
-    title: 'Презентация Ассоциации (PDF)',
-    description: 'Цели, направления, приоритеты и форматы взаимодействия',
-    icon: FileText,
-    size: '2.3 MB',
-    href: 'materials/assosiation-3.pdf',
-    available: true,
-  },
-  {
-    title: 'Брендбук (PPTX)',
-    description: 'Фирменный стиль и правила использования материалов',
-    icon: FileText,
-    size: '24.9 MB',
-    href: 'materials/brandbook.pptx',
-    available: true,
-  },
+  { key: 'charter', icon: BookOpen, available: false },
+  { key: 'registration', icon: Award, available: false },
+  { key: 'membership', icon: FileCheck, available: false },
+  { key: 'presentation', icon: FileText, href: 'materials/assosiation-3.pdf', available: true },
+  { key: 'brandbook', icon: FileText, href: 'materials/brandbook.pptx', available: true },
 ]
 
 const membershipSteps = [
-  { step: '01', title: 'Ознакомление с документами', description: 'Изучите миссию, направления и формат участия.' },
-  { step: '02', title: 'Заполнение заявки', description: 'Выберите роль и отправьте информацию по организации или инициативе.' },
-  { step: '03', title: 'Экспертное рассмотрение', description: 'Профильная группа анализирует запрос и предлагает формат взаимодействия.' },
-  { step: '04', title: 'Подключение к экосистеме', description: 'Согласуем план работ и подключаем к проектам/подкомитетам.' },
+  { step: '01', titleKey: 'steps.step1.title', descriptionKey: 'steps.step1.description' },
+  { step: '02', titleKey: 'steps.step2.title', descriptionKey: 'steps.step2.description' },
+  { step: '03', titleKey: 'steps.step3.title', descriptionKey: 'steps.step3.description' },
+  { step: '04', titleKey: 'steps.step4.title', descriptionKey: 'steps.step4.description' },
 ]
 
-const roleLabelByValue: Record<string, string> = {
-  company: 'Компания (членство/партнерство)',
-  government: 'Государственный орган',
-  partner: 'Смежная/партнерская организация',
-  media: 'СМИ',
-  expert: 'Эксперт',
-  volunteer: 'Волонтер',
-}
-
-const defaultRoleValue = 'company'
-
 function getRoleFromSearchParams() {
-  if (typeof window === 'undefined') return defaultRoleValue
+  if (typeof window === 'undefined') return 'company'
   const roleParam = new URLSearchParams(window.location.search).get('role')
-  return roleParam && roleParam in roleLabelByValue ? roleParam : defaultRoleValue
+  const validRoles = ['company', 'government', 'partner', 'media', 'expert', 'volunteer']
+  return roleParam && validRoles.includes(roleParam) ? roleParam : 'company'
 }
 
 export function Documents() {
+  const t = useTranslations('documents');
   const [formData, setFormData] = useState({
     company: '',
     name: '',
@@ -123,7 +84,7 @@ export function Documents() {
     e.preventDefault();
 
     if (!captchaToken) {
-      setError("Пожалуйста, пройдите CAPTCHA");
+      setError(t('form.captchaError'));
       return;
     }
   
@@ -153,7 +114,7 @@ export function Documents() {
       const data = await response.json();
   
       if (!response.ok) {
-        setError(data.error || 'Произошла ошибка при отправке');
+        setError(data.error || t('form.error'));
         return;
       }
   
@@ -179,11 +140,13 @@ export function Documents() {
   
     } catch (err: any) {
       console.error('Ошибка при отправке формы:', err);
-      setError(err?.message || 'Не удалось отправить форму. Попробуйте позже.');
+      setError(err?.message || t('form.error'));
     } finally {
       setLoading(false);
     }
   };
+
+  const roleOptions = ['company', 'government', 'partner', 'media', 'expert', 'volunteer'];
 
   return (
     <section className="py-24 relative overflow-hidden" id="documents">
@@ -196,12 +159,12 @@ export function Documents() {
         <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="max-w-4xl mb-16">
           <div className="flex items-center gap-3 mb-6">
             <div className="h-px w-12 bg-[#5F68A5]" />
-            <span className="text-[#5F68A5] text-sm tracking-[0.2em] uppercase font-medium">Документы и вступление</span>
+            <span className="text-[#5F68A5] text-sm tracking-[0.2em] uppercase font-medium">{t('sectionTitle')}</span>
           </div>
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#151515] mb-6 font-bebas leading-[0.95]">
-            Пакет материалов
+            {t('title')}
             <br />
-            <span className="text-[#5F891D]">и порядок взаимодействия</span>
+            <span className="text-[#5F891D]">{t('subtitle')}</span>
           </h2>
         </motion.div>
 
@@ -209,7 +172,7 @@ export function Documents() {
         <div className="grid lg:grid-cols-2 gap-12 mb-20">
           {/* Документы */}
           <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
-            <h3 className="text-2xl font-bold text-[#151515] font-bebas tracking-wide mb-6">Документация</h3>
+            <h3 className="text-2xl font-bold text-[#151515] font-bebas tracking-wide mb-6">{t('documentsTitle')}</h3>
             <div className="space-y-4">
               {documents.map((doc, index) => {
                 const Icon = doc.icon
@@ -219,11 +182,11 @@ export function Documents() {
                       <Icon className="w-5 h-5" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-bold text-[#151515] mb-0.5">{doc.title}</h4>
-                      <p className="text-sm text-[#151515]/55">{doc.description}</p>
+                      <h4 className="font-bold text-[#151515] mb-0.5">{t(`docs.${doc.key}.title`)}</h4>
+                      <p className="text-sm text-[#151515]/55">{t(`docs.${doc.key}.description`)}</p>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="text-xs text-[#151515]/45 hidden sm:block">{doc.size}</span>
+                      <span className="text-xs text-[#151515]/45 hidden sm:block">{t(`docs.${doc.key}.size`)}</span>
                       <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${doc.available ? 'bg-[#F3F4E9] text-[#5F68A5]' : 'bg-[#F3F4E9] text-[#151515]/35'}`}>
                         {doc.available ? <Download className="w-4 h-4" /> : <FileText className="w-4 h-4" />}
                       </div>
@@ -243,7 +206,7 @@ export function Documents() {
 
           {/* Шаги */}
           <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
-            <h3 className="text-2xl font-bold text-[#151515] font-bebas tracking-wide mb-6">Порядок вступления</h3>
+            <h3 className="text-2xl font-bold text-[#151515] font-bebas tracking-wide mb-6">{t('membershipTitle')}</h3>
             <div className="space-y-6">
               {membershipSteps.map((item, index) => (
                 <motion.div key={index} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: index * 0.08 }} className="relative">
@@ -253,8 +216,8 @@ export function Documents() {
                       {index < membershipSteps.length - 1 && <div className="w-px h-12 bg-[#151515]/20 mt-2" />}
                     </div>
                     <div className="pt-2">
-                      <h4 className="font-bold text-[#151515] mb-1">{item.title}</h4>
-                      <p className="text-sm text-[#151515]/62 leading-relaxed">{item.description}</p>
+                      <h4 className="font-bold text-[#151515] mb-1">{t(item.titleKey)}</h4>
+                      <p className="text-sm text-[#151515]/62 leading-relaxed">{t(item.descriptionKey)}</p>
                     </div>
                   </div>
                 </motion.div>
@@ -281,16 +244,12 @@ export function Documents() {
           <div className="relative z-10 p-8 md:p-12 lg:p-16">
             <div className="grid lg:grid-cols-2 gap-12">
               <div>
-                <h3 className="text-3xl md:text-4xl font-bold text-[#F3F4E9] font-bebas tracking-wide mb-4">Заявка на сотрудничество</h3>
+                <h3 className="text-3xl md:text-4xl font-bold text-[#F3F4E9] font-bebas tracking-wide mb-4">{t('form.title')}</h3>
                 <p className="text-[#F3F4E9]/62 leading-relaxed mb-8">
-                  Оставьте контакты и кратко опишите запрос — мы предложим формат: членство, партнёрство, экспертная проработка или участие в проекте.
+                  {t('form.description')}
                 </p>
                 <div className="space-y-4">
-                  {[
-                    'Членство и партнёрство для технологических компаний',
-                    'Экспертные запросы от госорганов и партнёров',
-                    'Подключение к проектам и мероприятиям Ассоциации'
-                  ].map((item, i) => (
+                  {t.raw('form.formOptions').map((item: string, i: number) => (
                     <div key={i} className="flex items-center gap-3 text-[#F3F4E9]/82">
                       <div className="w-6 h-6 rounded-full bg-[#5F891D]/20 flex items-center justify-center">
                         <ArrowRight className="w-3 h-3 text-[#5F891D]" />
@@ -307,9 +266,9 @@ export function Documents() {
                     <div className="w-20 h-20 bg-[#5F891D]/20 rounded-full flex items-center justify-center mb-6">
                       <CircleCheck className="w-10 h-10 text-[#5F891D]" />
                     </div>
-                    <h4 className="text-2xl font-bold text-[#F3F4E9] mb-2 font-bebas">Запрос отправлен</h4>
+                    <h4 className="text-2xl font-bold text-[#F3F4E9] mb-2 font-bebas">{t('form.submitted')}</h4>
                     <p className="text-[#F3F4E9]/60 max-w-sm">
-                      Роль: {roleLabelByValue[formData.role]}. Мы свяжемся с вами с предложением по формату взаимодействия.
+                      {t('form.submittedDescription', { role: t(`form.roles.${formData.role}`) })}
                     </p>
                   </motion.div>
                 ) : (
@@ -317,39 +276,36 @@ export function Documents() {
                     <input type="text" style={{ display: 'none' }} value={formData.honeypot} onChange={(e) => setFormData({ ...formData, honeypot: e.target.value })} autoComplete="off" />
 
                     <div className="grid sm:grid-cols-2 gap-4">
-                      <Input required placeholder="Организация / компания *" value={formData.company} onChange={(e) => setFormData({ ...formData, company: e.target.value })} className="bg-white/10 border-white/10 text-[#F3F4E9] placeholder:text-[#F3F4E9]/45 focus:border-[#5F891D]" />
-                      <Input required placeholder="Контактное лицо *" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="bg-white/10 border-white/10 text-[#F3F4E9] placeholder:text-[#F3F4E9]/45 focus:border-[#5F891D]" />
+                      <Input required placeholder={t('form.placeholders.company')} value={formData.company} onChange={(e) => setFormData({ ...formData, company: e.target.value })} className="bg-white/10 border-white/10 text-[#F3F4E9] placeholder:text-[#F3F4E9]/45 focus:border-[#5F891D]" />
+                      <Input required placeholder={t('form.placeholders.name')} value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="bg-white/10 border-white/10 text-[#F3F4E9] placeholder:text-[#F3F4E9]/45 focus:border-[#5F891D]" />
                     </div>
 
                     <div className="grid sm:grid-cols-2 gap-4">
-                      <Input required type="email" placeholder="Email *" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="bg-white/10 border-white/10 text-[#F3F4E9] placeholder:text-[#F3F4E9]/45 focus:border-[#5F891D]" />
-                      <Input required type="tel" placeholder="Телефон *" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} className="bg-white/10 border-white/10 text-[#F3F4E9] placeholder:text-[#F3F4E9]/45 focus:border-[#5F891D]" />
+                      <Input required type="email" placeholder={t('form.placeholders.email')} value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="bg-white/10 border-white/10 text-[#F3F4E9] placeholder:text-[#F3F4E9]/45 focus:border-[#5F891D]" />
+                      <Input required type="tel" placeholder={t('form.placeholders.phone')} value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} className="bg-white/10 border-white/10 text-[#F3F4E9] placeholder:text-[#F3F4E9]/45 focus:border-[#5F891D]" />
                     </div>
 
                     <div>
                       <select value={formData.role} onChange={(e) => setFormData({ ...formData, role: e.target.value })} className="w-full h-10 rounded-md border border-white/10 bg-white/10 px-3 text-sm text-[#F3F4E9] focus:outline-none focus:border-[#5F891D]">
-                        <option value="company">Компания (членство/партнерство)</option>
-                        <option value="government">Государственный орган</option>
-                        <option value="partner">Смежная/партнерская организация</option>
-                        <option value="media">СМИ</option>
-                        <option value="expert">Эксперт</option>
-                        <option value="volunteer">Волонтер</option>
+                        {roleOptions.map((role) => (
+                          <option key={role} value={role}>{t(`form.roles.${role}`)}</option>
+                        ))}
                       </select>
                     </div>
 
-                    <Textarea placeholder="Сообщение (необязательно)" value={formData.message} onChange={(e) => setFormData({ ...formData, message: e.target.value })} className="bg-white/10 border-white/10 text-[#F3F4E9] placeholder:text-[#F3F4E9]/45 focus:border-[#5F891D]" rows={4} />
+                    <Textarea placeholder={t('form.placeholders.message')} value={formData.message} onChange={(e) => setFormData({ ...formData, message: e.target.value })} className="bg-white/10 border-white/10 text-[#F3F4E9] placeholder:text-[#F3F4E9]/45 focus:border-[#5F891D]" rows={4} />
 
                     {/* reCAPTCHA */}
                     <div
-                    className="g-recaptcha"
-                    data-sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
-                    data-callback="onCaptchaSuccess"
-/>
+                      className="g-recaptcha"
+                      data-sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+                      data-callback="onCaptchaSuccess"
+                    />
 
                     {error && <p className="text-[#F8911D] text-sm">{error}</p>}
 
                     <button type="submit" disabled={loading} className="inline-flex items-center gap-2 bg-[#5F891D] text-white px-6 py-3 rounded-xl font-bold hover:bg-[#4e7015] transition-all">
-                      {loading ? 'Отправка...' : 'Отправить'}
+                      {loading ? t('form.sending') : t('form.submit')}
                       <Send className="w-4 h-4" />
                     </button>
                   </form>

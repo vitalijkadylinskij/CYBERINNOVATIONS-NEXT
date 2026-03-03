@@ -1,58 +1,31 @@
 import { motion } from "framer-motion";
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
+import { useTranslations } from "next-intl";
 
 interface RoleAccent {
-  role: string;
-  action: string;
+  roleKey: string;
+  actionKey: string;
   roleValue: string;
 }
 
-const goals = [
-  'Объединять технологические компании, отраслевых заказчиков и экспертов вокруг приоритетов цифровой экономики Беларуси.',
-  'Формировать требования, стандарты и инициативы для внедрения конвергентных технологий в отраслях.',
-  'Запускать пилоты и сопровождать тиражирование решений: от запроса — до внедрения и оценки эффекта.',
-  'Развивать опорные контуры: вычислительная инфраструктура, инвестиционные механизмы и подготовка кадров.',
-];
-
-const accents = [
-  'Работаем через подкомитеты и проектные группы: собираем запрос, экспертизу и план внедрения.',
-  'Подключаем участников к проектам и ресурсам: пилотные площадки, партнёрства, финансирование, международные связи.',
-];
-
+// Variables: keep roleValue
 const roleAccents: RoleAccent[] = [
-  {
-    role: 'Компания из профильной сферы',
-    action: 'Оставьте заявку на членство/партнёрство. Подключим к подкомитетам, пилотам и проектам под вашу отрасль.',
-    roleValue: 'company',
-  },
-  {
-    role: 'Представитель государственных органов',
-    action: 'Отправьте запрос на экспертизу, подбор решений или запуск пилота для задач ведомства/отрасли.',
-    roleValue: 'government',
-  },
-  {
-    role: 'Смежная или партнёрская организация',
-    action: 'Запросите сотрудничество: совместные инициативы, соглашения, мероприятия, обмен экспертизой и ресурсами.',
-    roleValue: 'partner',
-  },
-  {
-    role: 'Представитель СМИ',
-    action: 'Запросите комментарий, справку по проектам или контакт для интервью/публичного выступления.',
-    roleValue: 'media',
-  },
-  {
-    role: 'Эксперт',
-    action: 'Подайте заявку в экспертные группы: стандарты, аналитика, оценка проектов, методики внедрения.',
-    roleValue: 'expert',
-  },
-  {
-    role: 'Волонтёр',
-    action: 'Оставьте заявку на участие в мероприятиях и организационной поддержке инициатив Ассоциации.',
-    roleValue: 'volunteer',
-  },
+  { roleKey: 'roles.company.role', actionKey: 'roles.company.action', roleValue: 'company' },
+  { roleKey: 'roles.government.role', actionKey: 'roles.government.action', roleValue: 'government' },
+  { roleKey: 'roles.partner.role', actionKey: 'roles.partner.action', roleValue: 'partner' },
+  { roleKey: 'roles.media.role', actionKey: 'roles.media.action', roleValue: 'media' },
+  { roleKey: 'roles.expert.role', actionKey: 'roles.expert.action', roleValue: 'expert' },
+  { roleKey: 'roles.volunteer.role', actionKey: 'roles.volunteer.action', roleValue: 'volunteer' },
 ];
 
 export function GoalsAndAccents() {
+  const t = useTranslations('goals');
+
+  const goals = [
+    t('keyGoals'),
+    t('howWeWork'),
+  ];
+
   return (
     <section className="py-24 relative overflow-hidden" id="goals">
       <div className="absolute inset-0 bg-white" />
@@ -69,15 +42,15 @@ export function GoalsAndAccents() {
         >
           <div className="flex items-center gap-3 mb-6">
             <div className="h-px w-12 bg-[#5F68A5]" />
-            <span className="text-[#5F68A5] text-sm tracking-[0.2em] uppercase font-medium">Цели и акценты</span>
+            <span className="text-[#5F68A5] text-sm tracking-[0.2em] uppercase font-medium">{t('sectionTitle')}</span>
           </div>
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#151515] mb-6 font-bebas leading-[0.95]">
-            Цели Ассоциации
+            {t('title')}
             <br />
-            <span className="text-[#5F891D]">«Кибер Инновации»</span>
+            <span className="text-[#5F891D]">{t('subtitle')}</span>
           </h2>
           <p className="text-lg text-[#151515]/70 leading-relaxed max-w-4xl">
-            Объединяем лидеров инноваций, чтобы ускорять внедрение технологий в реальном секторе и госуправлении: от требований и стандартов — до пилотов, инфраструктуры и масштабирования.
+            {t('description')}
           </p>
         </motion.div>
 
@@ -88,12 +61,12 @@ export function GoalsAndAccents() {
             viewport={{ once: true }}
             className="rounded-2xl border border-[#151515]/10 bg-[#F3F4E9] p-7"
           >
-            <h3 className="text-2xl font-bebas text-[#151515] tracking-wide mb-5">Ключевые цели</h3>
+            <h3 className="text-2xl font-bebas text-[#151515] tracking-wide mb-5">{t('keyGoals')}</h3>
             <ul className="space-y-4">
-              {goals.map((goal, index) => (
+              {[0, 1, 2, 3].map((index) => (
                 <li key={index} className="flex items-start gap-3 text-[#151515]/75 leading-relaxed">
                   <CheckCircle2 className="w-5 h-5 text-[#5F68A5] mt-0.5 flex-shrink-0" />
-                  <span>{goal}</span>
+                  <span>{t(`goalsList.${index}`)}</span>
                 </li>
               ))}
             </ul>
@@ -105,18 +78,18 @@ export function GoalsAndAccents() {
             viewport={{ once: true }}
             className="rounded-2xl border border-[#151515]/10 bg-white p-7"
           >
-            <h3 className="text-2xl font-bebas text-[#151515] tracking-wide mb-5">Как работаем</h3>
+            <h3 className="text-2xl font-bebas text-[#151515] tracking-wide mb-5">{t('howWeWork')}</h3>
             <ul className="space-y-4 mb-6">
-              {accents.map((accent, index) => (
+              {[0, 1].map((index) => (
                 <li key={index} className="flex items-start gap-3 text-[#151515]/75 leading-relaxed">
                   <CheckCircle2 className="w-5 h-5 text-[#5F891D] mt-0.5 flex-shrink-0" />
-                  <span>{accent}</span>
+                  <span>{t(`accentsList.${index}`)}</span>
                 </li>
               ))}
             </ul>
             <div className="rounded-xl bg-[#F3F4E9] border border-[#151515]/10 p-4">
               <p className="text-sm text-[#151515]/70">
-                Оставьте запрос — мы направим его в профильный подкомитет, уточним вводные и предложим формат: рабочая группа, пилот, соглашение или вступление в Ассоциацию.
+                {t('howWeWorkNote')}
               </p>
             </div>
           </motion.div>
@@ -125,20 +98,20 @@ export function GoalsAndAccents() {
         <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-5">
           {roleAccents.map((item, index) => (
             <motion.div
-              key={item.role}
+              key={item.roleValue}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.05 }}
             >
               <div className="h-full rounded-2xl border border-[#151515]/10 bg-white p-5 flex flex-col">
-                <h4 className="text-lg font-bold text-[#151515] mb-3 font-bebas tracking-wide">{item.role}</h4>
-                <p className="text-sm text-[#151515]/70 leading-relaxed flex-1">{item.action}</p>
+                <h4 className="text-lg font-bold text-[#151515] mb-3 font-bebas tracking-wide">{t(item.roleKey)}</h4>
+                <p className="text-sm text-[#151515]/70 leading-relaxed flex-1">{t(item.actionKey)}</p>
                 <a
                   href={`?role=${item.roleValue}#contact`}
                   className="mt-5 inline-flex items-center gap-2 text-[#5F68A5] hover:text-[#5F891D] transition-colors"
                 >
-                  <span className="text-sm font-semibold">Перейти к заявке</span>
+                  <span className="text-sm font-semibold">{t('goToApplication')}</span>
                   <ArrowRight className="w-4 h-4" />
                 </a>
               </div>

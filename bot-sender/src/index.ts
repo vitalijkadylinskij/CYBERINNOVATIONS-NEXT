@@ -53,36 +53,49 @@ function verifySignature(body: string, timestamp: string, signature: string): bo
 async function sendToTelegram(message: string): Promise<boolean> {
   const MAX_RETRIES = 3;
   const BASE_DELAY = 1000; // 1 секунда
+  let deliveredCount = 0;
 
-  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
-    try {
-      for (const userId of RECIPIENT_USER_IDS) {
-        await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-          chat_id: userId,
-          text: message,
-          parse_mode: 'HTML',
-          disable_web_page_preview: true,
-          protect_content: true,
-        }, {
-          timeout: 10000,
-        });
+  for (const userId of RECIPIENT_USER_IDS) {
+    let sent = false;
+
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        await axios.post(
+          `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,
+          {
+            chat_id: userId,
+            text: message,
+            parse_mode: 'HTML',
+            disable_web_page_preview: true,
+            protect_content: true,
+          },
+          { timeout: 10000 }
+        );
+
+        sent = true;
+        deliveredCount++;
+        break;
+      } catch (error: any) {
+        const errorText =
+          error?.response?.data?.description ||
+          error?.message ||
+          'Unknown error';
+
+        console.error(`Recipient ${userId}, attempt ${attempt} failed:`, errorText);
+
+        if (attempt < MAX_RETRIES) {
+          const delay = BASE_DELAY * Math.pow(2, attempt - 1);
+          await new Promise((resolve) => setTimeout(resolve, delay));
+        }
       }
-      return true;
-    } catch (error: any) {
-      console.error(`Attempt ${attempt} failed:`, error.message);
+    }
 
-      // Если это последняя попытка - выходим с ошибкой
-      if (attempt === MAX_RETRIES) {
-        throw error;
-      }
-
-      // Экспоненциальный backoff
-      const delay = BASE_DELAY * Math.pow(2, attempt - 1);
-      await new Promise(resolve => setTimeout(resolve, delay));
+    if (!sent) {
+      console.warn(`Recipient ${userId} skipped after ${MAX_RETRIES} attempts`);
     }
   }
 
-  return false;
+  return deliveredCount > 0;
 }
 
 // Функция удаления webhook при старте

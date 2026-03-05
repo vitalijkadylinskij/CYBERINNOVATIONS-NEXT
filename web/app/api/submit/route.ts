@@ -36,8 +36,8 @@ function validateFormData(data: any): { valid: boolean; errors: string[] } {
   if (data.name && data.name.length > 100) errors.push('Contact name is too long (max 100 characters)');
   if (data.message && data.message.length > 1000) errors.push('Message is too long (max 1000 characters)');
 
-  const allowedChars = /^[a-zA-Z0-9а-яА-ЯёЁ\s\-.,!?@]+$/;
-  if (data.company && !allowedChars.test(data.company)) {
+  const allowedCompanyChars = /^[\p{L}\p{N}\s\-.,!?@&"'«»()\/+:#№]+$/u;
+  if (data.company && !allowedCompanyChars.test(data.company.trim())) {
     errors.push('Company name contains invalid characters');
   }
 
@@ -66,8 +66,9 @@ function checkHoneypot(data: any): boolean {
 
 // Минимальное время заполнения формы
 function checkFormFillTime(data: any): boolean {
-  if (!data.timestamp || isNaN(Number(data.timestamp))) return false;
-  return Date.now() - Number(data.timestamp) >= 3000;
+  const startedAt = Number(data.formStartedAt ?? data.timestamp);
+  if (!startedAt || isNaN(startedAt)) return false;
+  return Date.now() - startedAt >= 3000;
 }
 
 // CAPTCHA проверка

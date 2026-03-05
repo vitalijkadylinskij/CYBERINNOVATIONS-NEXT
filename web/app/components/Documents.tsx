@@ -106,14 +106,14 @@ export function Documents() {
     (window as any).onCaptchaSuccess = (token: string) => {
       setCaptchaToken(token);
     };
-  
+
     const script = document.createElement("script");
     script.src = "https://www.google.com/recaptcha/api.js";
     script.async = true;
     script.defer = true;
-  
+
     document.body.appendChild(script);
-  
+
     return () => {
       document.body.removeChild(script);
     };
@@ -126,37 +126,43 @@ export function Documents() {
       setError("Пожалуйста, пройдите CAPTCHA");
       return;
     }
-  
+
     try {
       // Проверка скорости отправки формы (минимум 3 секунды)
       if (Date.now() - formStartTime < 3000) {
         setError('Форма отправляется слишком быстро.');
         return;
       }
-  
+
       // Проверка honeypot — для защиты от ботов
       if (formData.honeypot) {
         setError('Бот-обнаружен.');
         return;
       }
-  
+
       // Подготовка данных для отправки
-      const dataToSend = { ...formData, timestamp: formStartTime, captchaToken };
-  
+      const dataToSend = {
+        ...formData,
+        timestamp: Date.now(),
+        formStartedAt: formStartTime,
+        captchaToken,
+      };
+
       // Отправка запроса на сервер
       const response = await fetch('/api/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(dataToSend),
       });
-  
+
       const data = await response.json();
-  
+
       if (!response.ok) {
-        setError(data.error || 'Произошла ошибка при отправке');
+        const details = Array.isArray(data?.details) ? `: ${data.details.join(', ')}` : '';
+        setError((data?.error || 'Произошла ошибка при отправке') + details);
         return;
       }
-  
+
       // Успешная отправка — обновляем UI
       setSubmitted(true);
       setFormData({
@@ -168,15 +174,15 @@ export function Documents() {
         message: '',
         honeypot: '',
       });
-  
+
       // Сброс reCAPTCHA (если библиотека загружена)
       if (window.grecaptcha?.reset) {
         window.grecaptcha.reset();
       }
       setCaptchaToken('');
-  
+
       setTimeout(() => setSubmitted(false), 3500);
-  
+
     } catch (err: any) {
       console.error('Ошибка при отправке формы:', err);
       setError(err?.message || 'Не удалось отправить форму. Попробуйте позже.');
@@ -341,10 +347,10 @@ export function Documents() {
 
                     {/* reCAPTCHA */}
                     <div
-                    className="g-recaptcha"
-                    data-sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
-                    data-callback="onCaptchaSuccess"
-/>
+                      className="g-recaptcha"
+                      data-sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+                      data-callback="onCaptchaSuccess"
+                    />
 
                     {error && <p className="text-[#F8911D] text-sm">{error}</p>}
 

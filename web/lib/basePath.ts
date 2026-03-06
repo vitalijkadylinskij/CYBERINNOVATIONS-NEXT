@@ -1,4 +1,17 @@
-export const basePath = process.env.NODE_ENV === "production" ? "/CYBERINNOVATIONS-NEXT" : "";
+function normalizeBasePath(path?: string): string {
+  if (!path) {
+    return "";
+  }
+
+  const trimmedPath = path.trim();
+  if (!trimmedPath || trimmedPath === "/") {
+    return "";
+  }
+
+  return `/${trimmedPath.replace(/^\/+|\/+$/g, "")}`;
+}
+
+export const basePath = normalizeBasePath(process.env.NEXT_PUBLIC_BASE_PATH);
 export const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL ||
   (process.env.NODE_ENV === "production"

@@ -1,3 +1,9 @@
+x-logging-default: &logging-default
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 services:
   web:
     build:
@@ -6,22 +12,24 @@ services:
       args:
         NEXT_PUBLIC_RECAPTCHA_SITE_KEY: ${NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
         NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost}
+        NEXT_PUBLIC_BASE_PATH: ${NEXT_PUBLIC_BASE_PATH:-}
     init: true
     environment:
       NODE_ENV: production
       PORT: 3000
       NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost}
-      BOT_SENDER_URL: ${BOT_SENDER_URL:-http://bot-sender:3001}
+      NEXT_PUBLIC_BASE_PATH: ${NEXT_PUBLIC_BASE_PATH:-}
+      BOT_SENDER_URL: http://bot-sender:3001
       RECAPTCHA_SECRET: ${RECAPTCHA_SECRET:?RECAPTCHA_SECRET is required}
       NEXT_PUBLIC_RECAPTCHA_SITE_KEY: ${NEXT_PUBLIC_RECAPTCHA_SITE_KEY:?NEXT_PUBLIC_RECAPTCHA_SITE_KEY is required}
       INTERNAL_HMAC_SECRET: ${INTERNAL_HMAC_SECRET:?INTERNAL_HMAC_SECRET is required}
     ports:
-      - "3000:3000"
-      - "443:443"
-      - "80:80"
+      - "${WEB_PORT:-3000}:3000"
     networks:
-      - app
+      - public
+      - bot-internal
     restart: unless-stopped
+    logging: *logging-default
     security_opt:
       - no-new-privileges:true
     cap_drop:
@@ -30,7 +38,7 @@ services:
     tmpfs:
       - /tmp
     healthcheck:
-      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/ru').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -54,8 +62,10 @@ services:
     expose:
       - "3001"
     networks:
-      - app
+      - bot-internal
+      - bot-egress
     restart: unless-stopped
+    logging: *logging-default
     security_opt:
       - no-new-privileges:true
     cap_drop:
@@ -71,5 +81,10 @@ services:
       start_period: 15s
 
 networks:
-  app:
+  public:
+    driver: bridge
+  bot-internal:
+    driver: bridge
+    internal: true
+  bot-egress:
     driver: bridge

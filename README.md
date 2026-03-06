@@ -73,6 +73,7 @@ curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates" | jq -r '
 
 ```dotenv
 NEXT_PUBLIC_SITE_URL=https://example.com
+NEXT_PUBLIC_BASE_PATH=
 WEB_PORT=80
 BOT_SENDER_URL=http://bot-sender:3001
 
@@ -84,6 +85,8 @@ RECIPIENT_USER_IDS=473779853
 
 ENABLE_DEBUG_ENDPOINTS=false
 ```
+
+`NEXT_PUBLIC_BASE_PATH` оставьте пустым для обычного запуска на корне домена. Заполняйте только если приложение реально публикуется под подпутём, например `/CYBERINNOVATIONS-NEXT`.
 
 ## 3. Запуск
 

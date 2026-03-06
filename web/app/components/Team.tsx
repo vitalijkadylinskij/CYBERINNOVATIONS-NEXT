@@ -13,26 +13,26 @@ const teamMembers: TeamMember[] = [
     name: 'ФИО — на утверждении',
     role: 'Председатель Ассоциации',
     description: 'Координация взаимодействия с государственными органами и развитие межотраслевого партнерства.',
-    image: "materials/brandbook-media/image2.png",
+    image: "materials/media/05.png",
   },
   {
     name: 'ФИО — на утверждении',
     role: 'Руководитель технологических подкомитетов',
     description:
       'Координация технологических подкомитетов: ИИ, блокчейн, IoT, кибербезопасность, микроэлектроника и робототехника, вычислительная инфраструктура, энергетика, подготовка кадров.',
-    image: "materials/brandbook-media/image2.png",
+    image: "materials/media/05.png",
   },
   {
     name: 'ФИО — на утверждении',
     role: 'Руководитель инвестиционного трека',
     description: 'Развитие программы партнерского финансирования и сопровождение инвестиционных инициатив.',
-    image: "materials/brandbook-media/image2.png",
+    image: "materials/media/05.png",
   },
   {
     name: 'ФИО — на утверждении',
     role: 'Руководитель образовательных и международных программ',
     description: 'Развитие кадрового резерва и международной повестки Ассоциации.',
-    image: "materials/brandbook-media/image2.png",
+    image: "materials/media/05.png",
   },
 ];
 
@@ -53,7 +53,9 @@ export function Team() {
           >
             <div className="flex items-center gap-3 mb-6">
               <div className="h-px w-12 bg-[#5F891D]" />
-              <span className="text-[#5F891D] text-sm tracking-[0.2em] uppercase font-medium">Эксперты ассоциации</span>
+              <span className="hidden text-[#5F891D] text-sm tracking-[0.2em] uppercase font-medium">
+                Эксперты ассоциации
+              </span>
             </div>
 
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#151515] font-bebas leading-[0.95]">

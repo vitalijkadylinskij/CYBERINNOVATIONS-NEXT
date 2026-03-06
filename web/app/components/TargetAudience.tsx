@@ -85,15 +85,11 @@ const audiences: AudienceGroup[] = [
 type Partner = { name: string; logo?: string };
 
 const partners: Partner[] = [
-  { name: 'BRICS Pay', logo: 'materials/partners/brics-pay.svg' },
-  { name: 'НЦОД', logo: 'materials/partners/ncod.svg' },
-  { name: 'СБХ', logo: 'materials/partners/sbh.svg' },
-  { name: 'АУРВА', logo: 'materials/partners/aurva.svg' },
-  { name: 'Бел. ТПП', logo: 'materials/partners/bel-tpp.svg' },
-  { name: 'ПЛАС', logo: 'materials/partners/plas.svg' },
-  { name: 'БелВЭБ', logo: 'materials/partners/belveb.svg' },
-  { name: 'ПВТ', logo: 'materials/partners/pvt.svg' },
-  { name: 'BYCLOUD', logo: 'materials/partners/bycloud.svg' },
+  { name: 'SL-Group', logo: 'materials/partners/SL-Group.svg' },
+  { name: 'BRICS Pay', logo: 'materials/partners/BICS_Pay.svg' },
+  { name: 'НЦОД', logo: 'materials/partners/ncod_banner_e.svg' },
+  { name: 'АУРВА', logo: 'materials/partners/АУРВА.svg' },
+  { name: 'PG', logo: 'materials/partners/pg-logo.svg' },
 ];
 
 function PartnerChip({ name, logo }: Partner) {
@@ -107,7 +103,11 @@ function PartnerChip({ name, logo }: Partner) {
           height={100}
           src={logo}
           alt={name}
-          className="max-h-10 md:max-h-12 max-w-[120px] md:max-w-[140px] object-contain opacity-80"
+          className={`object-contain opacity-80 ${
+            name === 'SL-Group' || name === 'НЦОД'
+              ? 'max-h-12 md:max-h-[3.5rem] max-w-[150px] md:max-w-[180px]'
+              : 'max-h-10 md:max-h-12 max-w-[120px] md:max-w-[140px]'
+          }`}
           onError={() => setErrored(true)}
           loading="lazy"
         />
@@ -301,10 +301,11 @@ export function TargetAudience() {
             </div>
 
             <div className="relative overflow-hidden py-4">
-              <div className="absolute left-0 top-0 bottom-0 w-24 md:w-40 bg-gradient-to-r from-white to-transparent z-10" />
-              <div className="absolute right-0 top-0 bottom-0 w-24 md:w-40 bg-gradient-to-l from-white to-transparent z-10" />
-
-              <motion.div animate={{ x: ['0%', '-50%'] }} transition={{ duration: 26, repeat: Infinity, ease: 'linear' }} className="flex gap-4 md:gap-7 items-center">
+              <motion.div
+                animate={{ x: ['0%', '-50%'] }}
+                transition={{ duration: 26, repeat: Infinity, ease: 'linear' }}
+                className="flex gap-4 md:gap-7 items-center"
+              >
                 {[...partners, ...partners].map((partner, index) => (
                   <PartnerChip key={`${partner.name}-${index}`} {...partner} />
                 ))}

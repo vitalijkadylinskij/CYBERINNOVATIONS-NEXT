@@ -42,56 +42,56 @@ const committeeMeta: Record<
     badge: "AI & ML",
     icon: Brain,
     accent: "#5F68A5",
-    image: "materials/brandbook-media/image2.png",
+    image: "materials/media/01.png",
   },
   blockchain: {
     title: "Распределённые реестры",
     badge: "Blockchain",
     icon: Link,
     accent: "#5F891D",
-    image: "materials/brandbook-media/image5.png",
+    image: "materials/media/02.png",
   },
   iot: {
     title: "Интернет вещей",
     badge: "IoT",
     icon: Radio,
     accent: "#5F891D",
-    image: "materials/brandbook-media/image11.png",
+    image: "materials/media/03.png",
   },
   cybersecurity: {
     title: "Кибербезопасность",
     badge: "Cybersecurity",
     icon: Shield,
     accent: "#5F68A5",
-    image: "materials/brandbook-media/image23.png",
+    image: "materials/media/04.png",
   },
   microelectronics: {
     title: "Микроэлектроника",
     badge: "Robotics",
     icon: Cpu,
     accent: "#5F68A5",
-    image: "materials/brandbook-media/image26.png",
+    image: "materials/media/05.png",
   },
   cloud: {
     title: "Вычислительная инфраструктура",
     badge: "Cloud",
     icon: Cloud,
     accent: "#5F891D",
-    image: "materials/brandbook-media/image28.png",
+    image: "materials/media/06.png",
   },
   energy: {
     title: "Энергетическая инфраструктура",
     badge: "Energy",
     icon: Zap,
     accent: "#5F891D",
-    image: "materials/brandbook-media/image29.png",
+    image: "materials/media/07.png",
   },
   "human-capital": {
     title: "Подготовка кадров",
     badge: "Human Capital",
     icon: Users,
     accent: "#5F68A5",
-    image: "materials/brandbook-media/image31.png",
+    image: "materials/media/08.png",
   },
 };
 
@@ -113,7 +113,7 @@ export function Hero({ activeCommittee: initialCommittee = 'ai' }: HeroProps) {
     return () => clearInterval(timer);
   }, [activeCommittee]);
 
-  const heroImage = "materials/brandbook-media/image40.png";
+  const heroImage = "materials/media/05.png";
   const current = committeeMeta[activeCommittee];
   const nextKey = committeeOrder[(committeeOrder.indexOf(activeCommittee) + 1) % committeeOrder.length];
   const next = committeeMeta[nextKey];

@@ -149,22 +149,24 @@ export function Priorities() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.4, delay: 0.1 }}
-          className={`grid gap-6 ${activeTab === '2026' ? 'md:grid-cols-3' : 'md:grid-cols-2 lg:grid-cols-4'}`}
+          className={`grid gap-6 ${
+            activeTab === '2026' ? 'md:grid-cols-2 lg:grid-cols-3' : 'md:grid-cols-2 lg:grid-cols-4'
+          }`}
         >
           {priorities.map((priority, index) => {
             const Icon = priority.icon;
 
             return (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="group"
-              >
-                <div
-                  className={`
-                    relative h-full rounded-2xl p-8 transition-all duration-300 overflow-hidden
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="group"
+                >
+                  <div
+                    className={`
+                    relative h-full rounded-2xl p-6 md:p-8 transition-all duration-300 overflow-hidden
                     ${
                       priority.highlight
                         ? 'bg-white border border-[#151515]/10 shadow-lg'
@@ -178,7 +180,7 @@ export function Priorities() {
 
                   {priority.metric && (
                     <div className={`absolute top-6 right-6 text-right ${priority.highlight ? 'text-[#5F891D]' : 'text-[#5F68A5]'}`}>
-                      <span className="text-2xl md:text-3xl font-bold font-bebas">{priority.metric}</span>
+                      <span className="text-lg md:text-xl font-bold font-bebas">{priority.metric}</span>
                     </div>
                   )}
 
@@ -191,7 +193,7 @@ export function Priorities() {
                       <Icon className="w-7 h-7" />
                     </div>
 
-                    <h4 className="text-xl md:text-2xl font-bold mb-3 font-bebas tracking-wide max-w-[85%] text-[#151515]">
+                    <h4 className="text-xl md:text-2xl font-bold mb-3 font-bebas tracking-wide text-[#151515]">
                       {priority.title}
                     </h4>
                     <p className={`leading-relaxed text-[#151515]/65`}>

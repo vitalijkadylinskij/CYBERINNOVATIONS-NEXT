@@ -3,81 +3,58 @@ import { useMemo, useState } from 'react';
 import { motion } from "framer-motion";
 import { Building2, GraduationCap, Briefcase, Rocket, Users, Check } from 'lucide-react';
 import Image from 'next/image';
+import { useTranslations } from "next-intl";
 import OrbitLabels from './ui/OrbitLabels';
+import { withBasePath } from "@/lib/basePath";
 
 interface AudienceGroup {
   icon: React.ElementType;
-  shortLabel: string;
-  title: string;
-  subtitle: string;
-  benefits: string[];
+  shortLabelKey: string;
+  titleKey: string;
+  subtitleKey: string;
+  benefitsKeys: string[];
   color: string;
 }
 
 const audiences: AudienceGroup[] = [
   {
     icon: Building2,
-    shortLabel: 'Госорганы',
-    title: 'Государственным органам',
-    subtitle: 'Стратегическая экспертиза',
-    benefits: [
-      'Экспертный контур для нормативных инициатив, стандартов и методик внедрения.',
-      'Подбор решений и команд для пилотов в госинфраструктуре и приоритетных отраслях.',
-      'Площадка согласования требований: государство ↔ бизнес ↔ наука.',
-      'Единое окно отраслевых коммуникаций и международного взаимодействия.',
-    ],
+    shortLabelKey: 'groups.government.shortLabel',
+    titleKey: 'groups.government.title',
+    subtitleKey: 'groups.government.subtitle',
+    benefitsKeys: ['groups.government.benefits.0', 'groups.government.benefits.1', 'groups.government.benefits.2', 'groups.government.benefits.3'],
     color: '#5F68A5',
   },
   {
     icon: GraduationCap,
-    shortLabel: 'Академия',
-    title: 'Академической среде',
-    subtitle: 'От теории к практике',
-    benefits: [
-      'Канал внедрения R&D в реальный сектор: проекты, заказчики, партнёры.',
-      'Совместные программы с индустрией: прикладные исследования и пилоты.',
-      'Поддержка молодых специалистов: наставники, стажировки, индустриальные задачи.',
-      'Международные связи: партнёрства и кооперация с научными центрами.',
-    ],
+    shortLabelKey: 'groups.academy.shortLabel',
+    titleKey: 'groups.academy.title',
+    subtitleKey: 'groups.academy.subtitle',
+    benefitsKeys: ['groups.academy.benefits.0', 'groups.academy.benefits.1', 'groups.academy.benefits.2', 'groups.academy.benefits.3'],
     color: '#5F891D',
   },
   {
     icon: Briefcase,
-    shortLabel: 'Бизнес',
-    title: 'Бизнесу',
-    subtitle: 'Масштабирование и влияние',
-    benefits: [
-      'Влияние на правила рынка и стандарты через рабочие группы и экспертизу.',
-      'Доступ к пилотным площадкам и отраслевым заказчикам для апробации решений.',
-      'Привлечение ресурсов: партнёрское финансирование и инвест-контакты.',
-      'Масштабирование через кооперацию внутри экосистемы.',
-    ],
+    shortLabelKey: 'groups.business.shortLabel',
+    titleKey: 'groups.business.title',
+    subtitleKey: 'groups.business.subtitle',
+    benefitsKeys: ['groups.business.benefits.0', 'groups.business.benefits.1', 'groups.business.benefits.2', 'groups.business.benefits.3'],
     color: '#5F68A5',
   },
   {
     icon: Rocket,
-    shortLabel: 'Стартапы',
-    title: 'Стартапам и инвесторам',
-    subtitle: 'Акселерация капитала',
-    benefits: [
-      'Быстрая экспертиза проектов и подготовка к пилоту/сделке.',
-      'Доступ к заказчикам и точкам апробации внутри национальной экосистемы.',
-      'Подключение к акселераторам и международным контактам.',
-      'Smart Money: менторство по стратегии, продажам и масштабированию.',
-    ],
+    shortLabelKey: 'groups.startups.shortLabel',
+    titleKey: 'groups.startups.title',
+    subtitleKey: 'groups.startups.subtitle',
+    benefitsKeys: ['groups.startups.benefits.0', 'groups.startups.benefits.1', 'groups.startups.benefits.2', 'groups.startups.benefits.3'],
     color: '#5F891D',
   },
   {
     icon: Users,
-    shortLabel: 'Таланты',
-    title: 'Студентам и специалистам',
-    subtitle: 'Трамплин в индустрию',
-    benefits: [
-      'Стажировки и участие в реальных проектах участников Ассоциации.',
-      'Наставничество и карьерные консультации от лидеров отрасли.',
-      'Портфолио через конкурсы, хакатоны и прикладные задачи.',
-      'Профессиональный нетворкинг и доступ к мероприятиям.',
-    ],
+    shortLabelKey: 'groups.talents.shortLabel',
+    titleKey: 'groups.talents.title',
+    subtitleKey: 'groups.talents.subtitle',
+    benefitsKeys: ['groups.talents.benefits.0', 'groups.talents.benefits.1', 'groups.talents.benefits.2', 'groups.talents.benefits.3'],
     color: '#5F68A5',
   },
 ];
@@ -85,11 +62,11 @@ const audiences: AudienceGroup[] = [
 type Partner = { name: string; logo?: string };
 
 const partners: Partner[] = [
-  { name: 'SL-Group', logo: 'materials/partners/SL-Group.svg' },
-  { name: 'BRICS Pay', logo: 'materials/partners/BICS_Pay.svg' },
-  { name: 'НЦОД', logo: 'materials/partners/ncod_banner_e.svg' },
-  { name: 'АУРВА', logo: 'materials/partners/АУРВА.svg' },
-  { name: 'PG', logo: 'materials/partners/pg-logo.svg' },
+  { name: 'SL-Group', logo: withBasePath('/materials/partners/SL-Group.svg') },
+  { name: 'BRICS Pay', logo: withBasePath('/materials/partners/BICS_Pay.svg') },
+  { name: 'НЦОД', logo: withBasePath('/materials/partners/ncod_banner_e.svg') },
+  { name: 'АУРВА', logo: withBasePath('/materials/partners/АУРВА.svg') },
+  { name: 'PG', logo: withBasePath('/materials/partners/pg-logo.svg') },
 ];
 
 function PartnerChip({ name, logo }: Partner) {
@@ -103,11 +80,7 @@ function PartnerChip({ name, logo }: Partner) {
           height={100}
           src={logo}
           alt={name}
-          className={`object-contain opacity-80 ${
-            name === 'SL-Group' || name === 'НЦОД'
-              ? 'max-h-12 md:max-h-[3.5rem] max-w-[150px] md:max-w-[180px]'
-              : 'max-h-10 md:max-h-12 max-w-[120px] md:max-w-[140px]'
-          }`}
+          className="max-h-10 md:max-h-12 max-w-[120px] md:max-w-[140px] object-contain opacity-80"
           onError={() => setErrored(true)}
           loading="lazy"
         />
@@ -119,29 +92,30 @@ function PartnerChip({ name, logo }: Partner) {
 }
 
 export function TargetAudience() {
+  const t = useTranslations('audience');
   const [activeIndex, setActiveIndex] = useState(0);
 
   const active = useMemo(() => audiences[activeIndex], [activeIndex]);
   const ActiveIcon = active.icon;
 
   const labelItems = useMemo(() => 
-    audiences.map((item, index) => (
+    audiences.map((item) => (
       <button
-        key={item.title}
+        key={item.titleKey}
         type="button"
-        onClick={() => setActiveIndex(index)}
-        onMouseEnter={() => setActiveIndex(index)}
+        onClick={() => setActiveIndex(audiences.indexOf(item))}
+        onMouseEnter={() => setActiveIndex(audiences.indexOf(item))}
         className={`relative group w-full rounded-2xl bg-white/90 border px-4 py-3 shadow-sm transition-all pointer-events-auto ${
-          activeIndex === index ? 'border-[#5F891D]/35 shadow-md' : 'border-[#151515]/10 hover:shadow-md'
+          activeIndex === audiences.indexOf(item) ? 'border-[#5F891D]/35 shadow-md' : 'border-[#151515]/10 hover:shadow-md'
         }`}
       >
-        <p className="text-sm font-semibold text-[#151515] text-center">{item.shortLabel}</p>
+        <p className="text-sm font-semibold text-[#151515] text-center">{t(item.shortLabelKey)}</p>
         <p className="text-[11px] text-center mt-1" style={{ color: item.color }}>
-          {item.subtitle}
+          {t(item.subtitleKey)}
         </p>
       </button>
     )), 
-    [activeIndex]
+    [activeIndex, t]
   );
 
   return (
@@ -153,38 +127,34 @@ export function TargetAudience() {
       <div className="absolute bottom-40 -left-40 w-80 h-80 rounded-full bg-[#5F891D]/5 blur-3xl" />
 
       <div className="container mx-auto px-4 relative z-10">
-        {/* Заголовок */}
         <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="max-w-5xl mb-16">
           <div className="flex items-center gap-3 mb-6">
             <div className="h-px w-12 bg-[#5F891D]" />
-            <span className="text-[#5F891D] text-sm tracking-[0.2em] uppercase font-medium">Доверительное партнерство</span>
+            <span className="text-[#5F891D] text-sm tracking-[0.2em] uppercase font-medium">{t('sectionTitle')}</span>
           </div>
 
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#151515] mb-6 font-bebas leading-[0.95]">
-            Государственные органы, бизнес и наука
+            {t('title')}
             <br />
-            <span className="text-[#5F68A5]">единая координация</span>
+            <span className="text-[#5F68A5]">{t('subtitle')}</span>
           </h2>
 
           <p className="text-lg text-[#151515]/70 leading-relaxed max-w-3xl">
-            Единая координация: запросы государства, решения бизнеса и экспертиза академической среды — в рабочих группах и проектах.
+            {t('description')}
           </p>
         </motion.div>
 
-        {/* Орбита и центр */}
         <motion.div initial={{ opacity: 0, y: 28 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="rounded-3xl border border-[#151515]/10 bg-[#F3F4E9]/65 p-6 md:p-10 mb-14">
           <div className="relative min-h-[420px] lg:min-h-[540px]">
-            {/* Мобильные кнопки */}
             <div className="grid gap-3 lg:hidden mb-8">
               {audiences.map((item, idx) => (
-                <button key={item.title} type="button" onClick={() => setActiveIndex(idx)} className={`rounded-2xl bg-white border px-4 py-3 text-left transition-colors ${idx === activeIndex ? 'border-[#5F891D]/35' : 'border-[#151515]/10'}`}>
-                  <p className="text-sm font-semibold text-[#151515]">{item.shortLabel}</p>
-                  <p className="text-xs text-[#151515]/55">{item.subtitle}</p>
+                <button key={item.titleKey} type="button" onClick={() => setActiveIndex(idx)} className={`rounded-2xl bg-white border px-4 py-3 text-left transition-colors ${idx === activeIndex ? 'border-[#5F891D]/35' : 'border-[#151515]/10'}`}>
+                  <p className="text-sm font-semibold text-[#151515]">{t(item.shortLabelKey)}</p>
+                  <p className="text-xs text-[#151515]/55">{t(item.subtitleKey)}</p>
                 </button>
               ))}
             </div>
 
-            {/* Орбита для десктопа и планшета */}
             <div className="hidden min-[1024px]:flex absolute inset-0 items-center justify-center pointer-events-none">
               <div className="absolute inset-0 pointer-events-none">
                 <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden>
@@ -193,7 +163,6 @@ export function TargetAudience() {
                 </svg>
               </div>
 
-              {/* Адаптивные настройки орбиты для разных экранов */}
               <div className="w-full hidden min-[1536px]:block absolute left-[30%] z-40 pointer-events-none">
                 <OrbitLabels
                   items={labelItems}
@@ -229,7 +198,6 @@ export function TargetAudience() {
               </div>
             </div>
 
-            {/* Центр */}
             <div className="relative mt-4 lg:mt-0 lg:absolute lg:top-1/2 lg:left-1/2 lg:-translate-x-1/2 lg:-translate-y-1/2 w-full lg:w-[360px] z-0">
               <div className="relative rounded-3xl bg-white border border-[#151515]/10 p-6 md:p-8 text-center overflow-hidden shadow-sm">
                 <motion.div aria-hidden className="absolute -inset-24 rounded-full bg-gradient-to-r from-[#5F68A5]/12 via-[#5F891D]/10 to-transparent" animate={{ rotate: 360 }} transition={{ duration: 30, repeat: Infinity, ease: 'linear' }} />
@@ -244,26 +212,25 @@ export function TargetAudience() {
                   </motion.div>
 
                   <h3 className="text-2xl md:text-3xl font-bebas text-[#151515] leading-tight mb-3">
-                    Ассоциация
+                    {t('associationTitle')}
                     <br />
-                    «Кибер Инновации»
+                    {t('associationSubtitle')}
                   </h3>
                   <p className="text-sm text-[#151515]/70 leading-relaxed">
-                    Координационная платформа: экспертиза, рабочие группы, пилоты, стандарты и развитие кадров.
+                    {t('associationDescription')}
                   </p>
 
                   <div className="mt-5 inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#151515]/10 bg-white/70">
                     <span className="text-xs font-semibold" style={{ color: active.color }}>
-                      Активный сектор:
+                      {t('activeSector')}
                     </span>
-                    <span className="text-xs text-[#151515]/70">{active.shortLabel}</span>
+                    <span className="text-xs text-[#151515]/70">{t(active.shortLabelKey)}</span>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Партнёры */}
           <div className="mt-10 grid lg:grid-cols-2 gap-6 items-start">
             <div className="rounded-2xl bg-white border border-[#151515]/10 p-6">
               <div className="flex items-start justify-between gap-4 mb-4">
@@ -271,24 +238,24 @@ export function TargetAudience() {
                   <ActiveIcon className="w-6 h-6" />
                 </div>
                 <span className="text-xs font-medium tracking-[0.16em] uppercase" style={{ color: active.color }}>
-                  {active.subtitle}
+                  {t(active.subtitleKey)}
                 </span>
               </div>
 
-              <h3 className="text-2xl font-bold text-[#151515] font-bebas tracking-wide mb-2">{active.title}</h3>
+              <h3 className="text-2xl font-bold text-[#151515] font-bebas tracking-wide mb-2">{t(active.titleKey)}</h3>
               <p className="text-sm text-[#151515]/70 leading-relaxed">
-                Подключаем к рабочим группам и проектам через единый контур взаимодействия.
+                {t('connectText')}
               </p>
             </div>
 
             <div className="rounded-2xl bg-white border border-[#151515]/10 p-6">
               <ul className="space-y-3">
-                {active.benefits.map((benefit, i) => (
+                {active.benefitsKeys.map((benefitKey: string, i: number) => (
                   <li key={i} className="flex items-start gap-3 text-sm text-[#151515]/75 leading-relaxed">
                     <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5" style={{ backgroundColor: `${active.color}15` }}>
                       <Check className="w-3 h-3" style={{ color: active.color }} />
                     </div>
-                    <span>{benefit}</span>
+                    <span>{t(benefitKey)}</span>
                   </li>
                 ))}
               </ul>
@@ -297,15 +264,14 @@ export function TargetAudience() {
 
           <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}>
             <div className="text-center my-8">
-              <span className="text-sm text-[#151515]/40 tracking-[0.2em] uppercase">Партнёры и соглашения</span>
+              <span className="text-sm text-[#151515]/40 tracking-[0.2em] uppercase">{t('partnersTitle')}</span>
             </div>
 
             <div className="relative overflow-hidden py-4">
-              <motion.div
-                animate={{ x: ['0%', '-50%'] }}
-                transition={{ duration: 26, repeat: Infinity, ease: 'linear' }}
-                className="flex gap-4 md:gap-7 items-center"
-              >
+              <div className="absolute left-0 top-0 bottom-0 w-24 md:w-40 bg-gradient-to-r from-white to-transparent z-10" />
+              <div className="absolute right-0 top-0 bottom-0 w-24 md:w-40 bg-gradient-to-l from-white to-transparent z-10" />
+
+              <motion.div animate={{ x: ['0%', '-50%'] }} transition={{ duration: 26, repeat: Infinity, ease: 'linear' }} className="flex gap-4 md:gap-7 items-center">
                 {[...partners, ...partners].map((partner, index) => (
                   <PartnerChip key={`${partner.name}-${index}`} {...partner} />
                 ))}

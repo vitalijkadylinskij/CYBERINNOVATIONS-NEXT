@@ -4,18 +4,28 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ArrowUpRight } from "lucide-react";
 import Image from "next/image";
-
-const navItems = [
-  { label: "О нас", href: "#about" },
-  { label: "Направления", href: "#directions" },
-  { label: "Членство", href: "#membership" },
-  { label: "Проекты", href: "#projects" },
-  { label: "Контакты", href: "#contact" },
-];
+import { useTranslations } from "next-intl";
+import { LanguageSwitcher } from "./LanguageSwitcher";
+import { useLocale } from "next-intl";
+import { withBasePath } from "@/lib/basePath";
 
 export function Header() {
+  const t = useTranslations('header');
+  const locale = useLocale();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+
+  const navItems = [
+    { label: t('about'), href: "#about" },
+    { label: t('directions'), href: "#directions" },
+    { label: t('membership'), href: "#membership" },
+    { label: t('projects'), href: "#projects" },
+    { label: t('contacts'), href: "#contact" },
+  ];
+
+  const logoSrc = locale === 'en' 
+    ? withBasePath("/logos/Logo-ACI-ENG.ver1.svg")
+    : withBasePath("/logos/Logo-ACI-RUS.ver1.svg");
 
   const handleAnchorClick = (
     event: React.MouseEvent<HTMLAnchorElement>,
@@ -69,10 +79,10 @@ export function Header() {
               onClick={(e) => handleAnchorClick(e, "#about")}
             >
               <Image
-                src="logos/Logo-ACI-RUS.ver1.svg"
+                src={logoSrc}
                 width={200}
                 height={100}
-                alt="Ассоциация Цифровых Технологий и Инноваций Кибер Инновации"
+                alt={locale === 'en' ? "Cyber Innovations Association" : "Ассоциация Цифровых Технологий и Инноваций Кибер Инновации"}
                 className="h-8 sm:h-10 md:h-12 w-auto object-contain"
                 style={{ minHeight: "2rem" }}
                 priority
@@ -95,7 +105,7 @@ export function Header() {
               </div>
             </nav>
 
-            <div className="hidden xl:flex items-center">
+            <div className="hidden xl:flex items-center gap-3">
               <motion.a
                 href="#contact"
                 whileHover={{ scale: 1.02 }}
@@ -106,15 +116,16 @@ export function Header() {
                     : "bg-white text-[#151515] hover:bg-white"
                 }`}
               >
-                <span>Подать заявку</span>
+                <span>{t('apply')}</span>
                 <ArrowUpRight className="w-4 h-4" />
               </motion.a>
+              <LanguageSwitcher />
             </div>
 
             <button
               className="xl:hidden w-10 h-10 rounded-full flex items-center justify-center text-[#F3F4E9] bg-white/10 flex-shrink-0"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              aria-label={mobileMenuOpen ? "Закрыть меню" : "Открыть меню"}
+              aria-label={mobileMenuOpen ? t('closeMenu') : t('openMenu')}
             >
               {mobileMenuOpen ? (
                 <X className="w-5 h-5" />
@@ -169,16 +180,17 @@ export function Header() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.35 }}
-                className="mt-8"
+                className="mt-8 flex items-center gap-4"
               >
                 <a
                   href="#contact"
                   className="inline-flex items-center gap-3 px-7 py-4 bg-white text-[#151515] font-bold rounded-full"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  <span>Подать заявку</span>
+                  <span>{t('apply')}</span>
                   <ArrowUpRight className="w-5 h-5" />
                 </a>
+                <LanguageSwitcher />
               </motion.div>
 
               <motion.div
@@ -189,7 +201,7 @@ export function Header() {
               >
                 <div className="h-px bg-white/10 mb-5" />
                 <p className="text-[#F3F4E9]/40 text-sm">
-                  © {new Date().getFullYear()} Кибер Инновации
+                  © {new Date().getFullYear()} {t('copyright')}
                 </p>
               </motion.div>
             </motion.nav>
@@ -199,4 +211,3 @@ export function Header() {
     </>
   );
 }
-

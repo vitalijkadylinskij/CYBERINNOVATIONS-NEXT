@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { motion, AnimatePresence } from "framer-motion";
 import { Brain, Link, Radio, Shield, Cpu, Cloud, Zap, X, Users } from 'lucide-react';
+import { useTranslations } from "next-intl";
 
 export type CommitteeKey =
   | 'ai'
@@ -14,84 +15,66 @@ export type CommitteeKey =
 
 interface Direction {
   key: CommitteeKey;
+  messageKey:
+    | 'ai'
+    | 'blockchain'
+    | 'iot'
+    | 'cybersecurity'
+    | 'microelectronics'
+    | 'cloud'
+    | 'energy'
+    | 'humanCapital';
   icon: React.ElementType;
-  title: string;
-  subtitle: string;
-  description: string;
   color: string;
 }
 
 const directions: Direction[] = [
   {
     key: 'ai',
+    messageKey: 'ai',
     icon: Brain,
-    title: 'Нейронные сети',
-    subtitle: 'AI',
-    description:
-      'Ассоциация содействует внедрению ИИ в реальный сектор, обеспечивая бизнесу доступ к государственным наборам данных (Datasets) для обучения моделей. Мы выступаем экспертным центром для госорганов в разработке этических и правовых стандартов использования ИИ, а для академической среды создаем площадки для коммерциализации наукоемких алгоритмов через пилотные проекты.',
     color: '#5F68A5',
   },
   {
     key: 'blockchain',
+    messageKey: 'blockchain',
     icon: Link,
-    title: 'Распределенные реестры',
-    subtitle: 'Blockchain',
-    description:
-      'Мы формируем прозрачную правовую среду для блокчейн-проектов, обеспечивая бизнесу защиту интересов при работе с цифровыми активами. Ассоциация помогает инвесторам находить надежные финтех-стартапы, а государству — внедрять защищенные реестры в систему управления, укрепляя технологический суверенитет и доверие к цифровым операциям.',
     color: '#5F891D',
   },
   {
     key: 'iot',
+    messageKey: 'iot',
     icon: Radio,
-    title: 'Интернет вещей',
-    subtitle: 'IoT',
-    description:
-      'Создаем «зеленый коридор» для тестирования IoT-решений, предоставляя стартапам и компаниям доступ к промышленной и городской инфраструктуре. Комитет координирует внедрение систем «умного города» в рамках госпрограмм, а для студентов и инженеров организует хакатоны по разработке прикладных датчиков и систем мониторинга.',
     color: '#5F68A5',
   },
   {
     key: 'cybersecurity',
+    messageKey: 'cybersecurity',
     icon: Shield,
-    title: 'Кибербезопасность',
-    subtitle: 'Cybersecurity',
-    description:
-      'Разрабатываем единые стандарты защиты критической инфраструктуры, обеспечивая государству высокий уровень национальной безопасности. Мы помогаем ИТ-компаниям сертифицировать свои продукты и выходить на международные рынки как надежные поставщики, а для специалистов организуем доступ к глобальной экспертизе и форумам по отражению киберугроз.',
     color: '#5F891D',
   },
   {
     key: 'microelectronics',
+    messageKey: 'microelectronics',
     icon: Cpu,
-    title: 'Микроэлектроника и робототехника',
-    subtitle: 'Microelectronics & Robotics',
-    description:
-      'Связываем фундаментальную науку с реальным производством для создания отечественной компонентной базы. Комитет лоббирует налоговые льготы и меры поддержки для производителей «железа», помогая предприятиям проводить глубокую автоматизацию и внедрять робототехнические комплексы в рамках импортозамещения.',
     color: '#5F68A5',
   },
   {
     key: 'cloud',
+    messageKey: 'cloud',
     icon: Cloud,
-    title: 'Инфраструктура для вычислений',
-    subtitle: 'Cloud Computing',
-    description:
-      'Обеспечиваем коллективный доступ членов Ассоциации к мощным вычислительным ресурсам, снижая затраты бизнеса на хранение и обработку данных. Мы помогаем госорганам в создании устойчивых национальных облачных платформ, а академической среде — в получении мощностей для проведения масштабных цифровых экспериментов.',
     color: '#5F891D',
   },
   {
     key: 'energy',
+    messageKey: 'energy',
     icon: Zap,
-    title: 'Энергетическая инфраструктура',
-    subtitle: 'Energy',
-    description:
-      'Фокусируемся на энергетической безопасности IT-сектора, внедряя технологии Smart Grid и возобновляемых источников. Ассоциация помогает энергетическим компаниям интегрировать инновационные разработки в энергосистему страны, обеспечивая инвесторам возвратность вложений через повышение энергоэффективности крупных ЦОДов и производств.',
     color: '#5F68A5',
   },
   {
     key: 'human-capital',
+    messageKey: 'humanCapital',
     icon: Users,
-    title: 'Подготовка кадров',
-    subtitle: 'Human Capital',
-    description:
-      'Готовим специалистов под реальные задачи отраслей и госзаказчиков: совместные программы с вузами, стажировки у участников Ассоциации и проектные треки с «витриной задач». Формируем требования к ролям и компетенциям для проектов национального масштаба.',
     color: '#5F891D',
   },
 ];
@@ -107,8 +90,10 @@ function isLgDown() {
 }
 
 export function TechnologyDirections({ activeKey, onActiveKeyChange }: TechnologyDirectionsProps) {
+  const t = useTranslations('directions');
   const [localKey, setLocalKey] = useState<CommitteeKey>('ai');
   const [mobileSheetOpen, setMobileSheetOpen] = useState(false);
+  const connectSteps = t.raw('connectSteps') as string[];
 
   const resolvedKey = activeKey ?? localKey;
 
@@ -140,18 +125,17 @@ export function TechnologyDirections({ activeKey, onActiveKeyChange }: Technolog
         >
           <div className="flex items-center gap-3 mb-6">
             <div className="h-px w-12 bg-[#5F68A5]" />
-            <span className="text-[#5F68A5] text-sm tracking-[0.2em] uppercase font-medium">Подкомитеты Ассоциации</span>
+            <span className="text-[#5F68A5] text-sm tracking-[0.2em] uppercase font-medium">{t('sectionTitle')}</span>
           </div>
 
           <div className="grid lg:grid-cols-2 gap-8 items-end">
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#151515] font-bebas leading-[0.95]">
-              8 направлений
+              {t('title')}
               <br />
-              <span className="text-[#5F891D]">конвергентных технологий</span>
+              <span className="text-[#5F891D]">{t('subtitle')}</span>
             </h2>
             <p className="text-lg text-[#151515]/70 leading-relaxed max-w-lg">
-              Выберите направление — описание и способы подключения всегда остаются в зоне видимости. На мобильных подробности
-              открываются поверх контента.
+              {t('description')}
             </p>
           </div>
         </motion.div>
@@ -194,14 +178,14 @@ export function TechnologyDirections({ activeKey, onActiveKeyChange }: Technolog
                     </div>
 
                     <h3 className="text-lg font-bold font-bebas tracking-wide mb-2 leading-tight text-[#151515] pr-10">
-                      {direction.title}
+                      {t(`techDirections.${direction.messageKey}.title`)}
                     </h3>
                     <p className="text-xs font-medium" style={{ color: direction.color }}>
-                      {direction.subtitle}
+                      {t(`techDirections.${direction.messageKey}.subtitle`)}
                     </p>
 
                     <div className={`mt-4 text-sm leading-relaxed ${isActive ? 'text-[#151515]/70' : 'text-[#151515]/55'}`}>
-                      {direction.description.slice(0, 120)}…
+                      {t(`techDirections.${direction.messageKey}.description`).slice(0, 120)}…
                     </div>
                   </motion.button>
                 );
@@ -231,12 +215,16 @@ export function TechnologyDirections({ activeKey, onActiveKeyChange }: Technolog
                         })()}
                       </div>
 
-                      <h3 className="text-3xl font-bold text-[#151515] font-bebas tracking-wide mb-2">{active.title}</h3>
+                      <h3 className="text-3xl font-bold text-[#151515] font-bebas tracking-wide mb-2">
+                        {t(`techDirections.${active.messageKey}.title`)}
+                      </h3>
                       <p className="text-sm font-medium mb-5" style={{ color: active.color }}>
-                        {active.subtitle}
+                        {t(`techDirections.${active.messageKey}.subtitle`)}
                       </p>
 
-                      <p className="text-[#151515]/75 leading-relaxed text-base">{active.description}</p>
+                      <p className="text-[#151515]/75 leading-relaxed text-base">
+                        {t(`techDirections.${active.messageKey}.description`)}
+                      </p>
                     </motion.div>
                   ) : (
                     <motion.div
@@ -247,7 +235,7 @@ export function TechnologyDirections({ activeKey, onActiveKeyChange }: Technolog
                       transition={{ duration: 0.2 }}
                     >
                       <p className="text-[#151515]/65 leading-relaxed">
-                        Выберите направление слева — здесь появится подробное описание.
+                        {t('selectDirection')}
                       </p>
                     </motion.div>
                   )}
@@ -277,7 +265,7 @@ export function TechnologyDirections({ activeKey, onActiveKeyChange }: Technolog
                 <button
                   onClick={() => setMobileSheetOpen(false)}
                   className="absolute top-4 right-4 w-10 h-10 rounded-full bg-[#151515]/5 hover:bg-[#151515]/10 flex items-center justify-center transition-colors"
-                  aria-label="Закрыть подробности"
+                  aria-label={t('closeDetails')}
                 >
                   <X className="w-5 h-5 text-[#151515]/60" />
                 </button>
@@ -293,26 +281,26 @@ export function TechnologyDirections({ activeKey, onActiveKeyChange }: Technolog
                     })()}
                   </div>
 
-                  <h3 className="text-2xl font-bold text-[#151515] font-bebas tracking-wide mb-2">{active.title}</h3>
+                  <h3 className="text-2xl font-bold text-[#151515] font-bebas tracking-wide mb-2">
+                    {t(`techDirections.${active.messageKey}.title`)}
+                  </h3>
                   <p className="text-sm font-medium mb-4" style={{ color: active.color }}>
-                    {active.subtitle}
+                    {t(`techDirections.${active.messageKey}.subtitle`)}
                   </p>
-                  <p className="text-[#151515]/75 leading-relaxed text-sm mb-6">{active.description}</p>
+                  <p className="text-[#151515]/75 leading-relaxed text-sm mb-6">
+                    {t(`techDirections.${active.messageKey}.description`)}
+                  </p>
                   
-                  <p className="text-xs tracking-[0.2em] uppercase text-[#151515]/45 font-medium mb-3">Как подключиться</p>
+                  <p className="text-xs tracking-[0.2em] uppercase text-[#151515]/45 font-medium mb-3">
+                    {t('howToConnect')}
+                  </p>
                   <ul className="space-y-2 text-sm text-[#151515]/70 leading-relaxed">
-                    <li className="flex gap-3">
-                      <span className="mt-1 w-1.5 h-1.5 rounded-full" style={{ backgroundColor: active.color }} />
-                      <span>Подать запрос в профильный подкомитет и определить формат участия.</span>
-                    </li>
-                    <li className="flex gap-3">
-                      <span className="mt-1 w-1.5 h-1.5 rounded-full" style={{ backgroundColor: active.color }} />
-                      <span>Подключиться к пилоту/проекту с отраслевым заказчиком или госорганом.</span>
-                    </li>
-                    <li className="flex gap-3">
-                      <span className="mt-1 w-1.5 h-1.5 rounded-full" style={{ backgroundColor: active.color }} />
-                      <span>Оформить партнёрство/членство для доступа к ресурсам и кооперации.</span>
-                    </li>
+                    {connectSteps.map((step) => (
+                      <li key={step} className="flex gap-3">
+                        <span className="mt-1 w-1.5 h-1.5 rounded-full" style={{ backgroundColor: active.color }} />
+                        <span>{step}</span>
+                      </li>
+                    ))}
                   </ul>
                 </div>
               </motion.div>

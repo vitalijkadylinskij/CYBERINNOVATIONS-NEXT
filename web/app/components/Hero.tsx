@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  ArrowDown,
   ArrowRight,
   DollarSign,
   Layers,
@@ -17,81 +16,76 @@ import {
   Zap,
 } from 'lucide-react';
 import Image from "next/image";
+import { useLocale, useTranslations } from "next-intl";
 import type { CommitteeKey } from './TechnologyDirections';
-
-const keyPoints = [
-  { icon: DollarSign, value: '200+', suffix: 'млн $', text: 'инвестиций' },
-  { icon: Layers, value: '8', suffix: '', text: 'направлений' },
-  { icon: Users, value: '50+', suffix: '', text: 'партнёров' },
-] as const;
+import { withBasePath } from "@/lib/basePath";
 
 const committeeOrder: CommitteeKey[] = ['ai', 'blockchain', 'iot', 'cybersecurity', 'microelectronics', 'cloud', 'energy', 'human-capital'];
 
-const committeeMeta: Record<
-  CommitteeKey,
-  {
-    title: string;
-    badge: string;
-    icon: React.ElementType;
-    accent: string;
-    image: string;
-  }
-> = {
+interface CommitteeMeta {
+  titleKey: string;
+  badgeKey: string;
+  icon: React.ElementType;
+  accent: string;
+  image: string;
+}
+
+const committeeMeta: Record<CommitteeKey, CommitteeMeta> = {
   ai: {
-    title: "Нейронные сети",
-    badge: "AI & ML",
+    titleKey: "ai.title",
+    badgeKey: "ai.badge",
     icon: Brain,
     accent: "#5F68A5",
-    image: "materials/media/01.webp",
+    image: withBasePath("/materials/media/01.webp"),
   },
   blockchain: {
-    title: "Распределённые реестры",
-    badge: "Blockchain",
+    titleKey: "blockchain.title",
+    badgeKey: "blockchain.badge",
     icon: Link,
     accent: "#5F891D",
-    image: "materials/media/02.webp",
+    image: withBasePath("/materials/media/02.webp"),
   },
   iot: {
-    title: "Интернет вещей",
-    badge: "IoT",
+    titleKey: "iot.title",
+    badgeKey: "iot.badge",
     icon: Radio,
     accent: "#5F891D",
-    image: "materials/media/03.webp",
+    image: withBasePath("/materials/media/03.webp"),
   },
   cybersecurity: {
-    title: "Кибербезопасность",
-    badge: "Cybersecurity",
+    titleKey: "cybersecurity.title",
+    badgeKey: "cybersecurity.badge",
     icon: Shield,
     accent: "#5F68A5",
-    image: "materials/media/04.webp",
+    image: withBasePath("/materials/media/04.webp"),
   },
   microelectronics: {
-    title: "Микроэлектроника",
-    badge: "Robotics",
+    titleKey: "microelectronics.title",
+    badgeKey: "microelectronics.badge",
     icon: Cpu,
     accent: "#5F68A5",
-    image: "materials/media/05.webp",
+    image: withBasePath("/materials/media/05.webp"),
   },
   cloud: {
-    title: "Вычислительная инфраструктура",
-    badge: "Cloud",
+    titleKey: "cloud.title",
+    badgeKey: "cloud.badge",
     icon: Cloud,
     accent: "#5F891D",
-    image: "materials/media/06.webp",
+    image: withBasePath("/materials/media/06.webp"),
   },
   energy: {
-    title: "Энергетическая инфраструктура",
-    badge: "Energy",
+    titleKey: "energy.title",
+    badgeKey: "energy.badge",
     icon: Zap,
     accent: "#5F891D",
-    image: "materials/media/07.webp",
+    image: withBasePath("/materials/media/07.webp"),
   },
   "human-capital": {
-    title: "Подготовка кадров",
-    badge: "Human Capital",
+    titleKey: "humanCapital.title",
+    badgeKey: "humanCapital.badge",
     icon: Users,
     accent: "#5F68A5",
-    image: "materials/media/08.webp",
+    image: withBasePath("/materials/media/08.webp"),
   },
 };
 
@@ -102,7 +96,20 @@ interface HeroProps {
 const SLIDE_INTERVAL_MS = 5000;
 
 export function Hero({ activeCommittee: initialCommittee = 'ai' }: HeroProps) {
+  const t = useTranslations('hero');
+  const tCommon = useTranslations('common');
+  const locale = useLocale();
   const [activeCommittee, setActiveCommittee] = useState<CommitteeKey>(initialCommittee);
+  const keyPoints = [
+    {
+      icon: DollarSign,
+      value: '200+',
+      suffix: locale === 'en' ? 'M USD' : 'млн $',
+      textKey: 'investments',
+    },
+    { icon: Layers, value: '8', suffix: '', textKey: 'directions' },
+    { icon: Users, value: '50+', suffix: '', textKey: 'partners' },
+  ] as const;
 
   useEffect(() => {
     const idx = committeeOrder.indexOf(activeCommittee);
@@ -113,12 +120,12 @@ export function Hero({ activeCommittee: initialCommittee = 'ai' }: HeroProps) {
     return () => clearInterval(timer);
   }, [activeCommittee]);
 
-  const heroImage = "materials/media/05.webp";
-  const current = committeeMeta[activeCommittee];
+  const heroImage = withBasePath("/materials/media/05.webp");
+  const currentMeta = committeeMeta[activeCommittee];
   const nextKey = committeeOrder[(committeeOrder.indexOf(activeCommittee) + 1) % committeeOrder.length];
-  const next = committeeMeta[nextKey];
-  const CurrentIcon = current.icon;
-  const NextIcon = next.icon;
+  const nextMeta = committeeMeta[nextKey];
+  const CurrentIcon = currentMeta.icon;
+  const NextIcon = nextMeta.icon;
 
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden" id="about">
@@ -127,7 +134,8 @@ export function Hero({ activeCommittee: initialCommittee = 'ai' }: HeroProps) {
           width={100}
           height={100}
           src={heroImage}
-          alt="Технологический фон Ассоциации"
+          alt=""
+          aria-hidden="true"
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-[#0f1115]/85" />
@@ -157,19 +165,18 @@ export function Hero({ activeCommittee: initialCommittee = 'ai' }: HeroProps) {
               <div className="inline-flex items-center gap-3 mb-7">
                 <div className="h-px w-12 bg-[#5F891D]" />
                 <span className="text-[#5F891D] text-sm tracking-[0.2em] uppercase font-medium">
-                  Республика Беларусь
+                  {t('country')}
                 </span>
               </div>
 
               <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-[#F3F4E9] mb-6 font-bebas leading-[0.95] tracking-tight">
-                <span className="block">Ассоциация</span>
-                <span className="block text-[#5F68A5]">Цифровых</span>
-                <span className="block">технологий</span>
+                <span className="block">{t('titleLine1')}</span>
+                <span className="block text-[#5F68A5]">{t('titleLine2')}</span>
+                <span className="block">{t('titleLine3')}</span>
               </h1>
 
               <p className="text-base md:text-lg text-[#F3F4E9]/78 mb-9 leading-relaxed max-w-xl">
-                Объединяем лидеров в сфере инноваций, чтобы ускорять внедрение технологий в реальном секторе и
-                госуправлении — от требований и стандартов до пилотов, инфраструктуры и масштабирования.
+                {t('description')}
               </p>
 
               <div className="flex flex-col sm:flex-row gap-3">
@@ -179,7 +186,7 @@ export function Hero({ activeCommittee: initialCommittee = 'ai' }: HeroProps) {
                   whileTap={{ scale: 0.98 }}
                   className="group inline-flex items-center justify-center gap-3 px-6 sm:px-8 py-4 bg-[#5F891D] text-[#151515] font-bold rounded-full hover:bg-[#5F891D]/90 transition-colors w-full sm:w-auto"
                 >
-                  <span>Стать членом Ассоциации</span>
+                  <span>{t('becomeMember')}</span>
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </motion.a>
 
@@ -189,7 +196,7 @@ export function Hero({ activeCommittee: initialCommittee = 'ai' }: HeroProps) {
                   whileTap={{ scale: 0.98 }}
                   className="inline-flex items-center justify-center gap-3 px-6 sm:px-8 py-4 border border-[#F3F4E9]/30 text-[#F3F4E9] font-medium rounded-full hover:bg-[#F3F4E9]/10 transition-colors w-full sm:w-auto"
                 >
-                  <span>Узнать больше</span>
+                  <span>{t('learnMore')}</span>
                 </motion.a>
               </div>
             </motion.div>
@@ -212,7 +219,7 @@ export function Hero({ activeCommittee: initialCommittee = 'ai' }: HeroProps) {
                         <span className="text-xl md:text-2xl font-bold text-[#F3F4E9] font-bebas">{p.value}</span>
                         {p.suffix ? <span className="text-xs md:text-sm text-[#F3F4E9]/65">{p.suffix}</span> : null}
                       </div>
-                      <div className="text-xs md:text-sm text-[#F3F4E9]/55">{p.text}</div>
+                      <div className="text-xs md:text-sm text-[#F3F4E9]/55">{tCommon(`keyPoints.${p.textKey}`)}</div>
                     </div>
                   </div>
                 );
@@ -240,8 +247,8 @@ export function Hero({ activeCommittee: initialCommittee = 'ai' }: HeroProps) {
                   >
                     <Image
                       fill
-                      src={current.image}
-                      alt={current.title}
+                      src={currentMeta.image}
+                      alt={t(`techDirections.${currentMeta.titleKey}`)}
                       className="w-full h-full object-cover"
                       priority
                     />
@@ -264,13 +271,13 @@ export function Hero({ activeCommittee: initialCommittee = 'ai' }: HeroProps) {
                     <div className="inline-flex items-center gap-3 px-4 py-2 rounded-2xl bg-[#0f1115]/65 border border-white/10 backdrop-blur">
                       <div
                         className="w-8 h-8 rounded-xl flex items-center justify-center"
-                        style={{ backgroundColor: `${current.accent}22`, color: current.accent }}
+                        style={{ backgroundColor: `${currentMeta.accent}22`, color: currentMeta.accent }}
                       >
                         <CurrentIcon className="w-4.5 h-4.5" />
                       </div>
                       <div className="leading-tight">
-                        <div className="text-xs font-semibold text-[#F3F4E9]">{current.badge}</div>
-                        <div className="text-[11px] text-[#F3F4E9]/60">{current.title}</div>
+                        <div className="text-xs font-semibold text-[#F3F4E9]">{t(`techDirections.${currentMeta.badgeKey}`)}</div>
+                        <div className="text-[11px] text-[#F3F4E9]/60">{t(`techDirections.${currentMeta.titleKey}`)}</div>
                       </div>
                     </div>
                   </motion.div>
@@ -289,13 +296,13 @@ export function Hero({ activeCommittee: initialCommittee = 'ai' }: HeroProps) {
                     <div className="inline-flex items-center gap-3 px-4 py-2 rounded-2xl bg-[#0f1115]/55 border border-white/10 backdrop-blur">
                       <div
                         className="w-8 h-8 rounded-xl flex items-center justify-center"
-                        style={{ backgroundColor: `${next.accent}22`, color: next.accent }}
+                        style={{ backgroundColor: `${nextMeta.accent}22`, color: nextMeta.accent }}
                       >
                         <NextIcon className="w-4.5 h-4.5" />
                       </div>
                       <div className="leading-tight">
-                        <div className="text-xs font-semibold text-[#F3F4E9]">{next.badge}</div>
-                        <div className="text-[11px] text-[#F3F4E9]/60">{next.title}</div>
+                        <div className="text-xs font-semibold text-[#F3F4E9]">{t(`techDirections.${nextMeta.badgeKey}`)}</div>
+                        <div className="text-[11px] text-[#F3F4E9]/60">{t(`techDirections.${nextMeta.titleKey}`)}</div>
                       </div>
                     </div>
                   </motion.div>
@@ -312,14 +319,14 @@ export function Hero({ activeCommittee: initialCommittee = 'ai' }: HeroProps) {
                     transition={{ duration: 0.4 }}
                     className="text-sm text-[#F3F4E9]/65"
                   >
-                    Активный комитет: <span className="text-[#F3F4E9] font-medium">{current.title}</span>
+                    {tCommon('activeCommittee')} <span className="text-[#F3F4E9] font-medium">{t(`techDirections.${currentMeta.titleKey}`)}</span>
                   </motion.div>
                 </AnimatePresence>
                 <a
                   href="#directions"
                   className="text-sm font-medium text-[#F3F4E9] hover:text-[#F3F4E9]/80 transition-colors inline-flex items-center gap-2"
                 >
-                  Направления
+                  {t('directions')}
                   <ArrowRight className="w-4 h-4" />
                 </a>
               </div>

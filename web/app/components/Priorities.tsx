@@ -1,30 +1,72 @@
+"use client";
+
 import { useState } from 'react';
 import { motion } from "framer-motion";
 import { TrendingUp, Server, Globe, DollarSign, Factory, Users as UsersIcon, Rocket as RocketIcon, ArrowRight } from 'lucide-react';
 import { useTranslations } from "next-intl";
+import { useLocale } from "next-intl";
 
 interface Priority {
-  key: string;
   icon: React.ElementType;
+  titleKey: string;
+  descriptionKey: string;
+  metricKey?: string;
   highlight?: boolean;
-  year: '2026' | '2030';
 }
 
-// Variables: keep icons, metrics, highlight flags
-const priorities: Priority[] = [
-  { key: 'capitalization', icon: DollarSign, year: '2026' },
-  { key: 'computing', icon: Server, highlight: true, year: '2026' },
-  { key: 'global', icon: Globe, year: '2026' },
-  { key: 'lift', icon: TrendingUp, year: '2030' },
-  { key: 'unicorns', icon: RocketIcon, highlight: true, year: '2030' },
-  { key: 'decentralization', icon: UsersIcon, year: '2030' },
-  { key: 'scaling', icon: Factory, year: '2030' },
+const priorities2026: Priority[] = [
+  {
+    icon: DollarSign,
+    titleKey: 'items2026.capitalization.title',
+    descriptionKey: 'items2026.capitalization.description',
+    metricKey: 'items2026.capitalization.metric',
+  },
+  {
+    icon: Server,
+    titleKey: 'items2026.computing.title',
+    descriptionKey: 'items2026.computing.description',
+    highlight: true,
+  },
+  {
+    icon: Globe,
+    titleKey: 'items2026.global.title',
+    descriptionKey: 'items2026.global.description',
+    metricKey: 'items2026.global.metric',
+  },
+];
+
+const priorities2030: Priority[] = [
+  {
+    icon: TrendingUp,
+    titleKey: 'items2030.lift.title',
+    descriptionKey: 'items2030.lift.description',
+    metricKey: 'items2030.lift.metric',
+  },
+  {
+    icon: RocketIcon,
+    titleKey: 'items2030.unicorns.title',
+    descriptionKey: 'items2030.unicorns.description',
+    metricKey: 'items2030.unicorns.metric',
+    highlight: true,
+  },
+  {
+    icon: UsersIcon,
+    titleKey: 'items2030.decentralization.title',
+    descriptionKey: 'items2030.decentralization.description',
+  },
+  {
+    icon: Factory,
+    titleKey: 'items2030.scaling.title',
+    descriptionKey: 'items2030.scaling.description',
+    metricKey: 'items2030.scaling.metric',
+  },
 ];
 
 export function Priorities() {
   const t = useTranslations('priorities');
-  const [activeTab] = useState<'2026' | '2030'>('2026');
-  const filteredPriorities = priorities.filter(p => p.year === activeTab);
+  const locale = useLocale();
+  const [activeTab, setActiveTab] = useState<'2026' | '2030'>('2026');
+  const priorities = activeTab === '2026' ? priorities2026 : priorities2030;
 
   return (
     <section className="py-24 relative overflow-hidden" id="priorities">
@@ -33,8 +75,8 @@ export function Priorities() {
       <div className="absolute inset-0 opacity-20">
         <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
           <defs>
-            <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#151515" strokeWidth="1" opacity="0.05" />
+            <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+              <path d="M 60 0 L 0 0 0 60" fill="none" stroke="#151515" strokeWidth="0.5" opacity="0.1" />
             </pattern>
           </defs>
           <rect width="100%" height="100%" fill="url(#grid)" />
@@ -42,58 +84,127 @@ export function Priorities() {
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mb-16"
-        >
-          <div className="flex items-center gap-3 mb-6">
-            <div className="h-px w-12 bg-[#5F68A5]" />
-            <span className="text-[#5F68A5] text-sm tracking-[0.2em] uppercase font-medium">{t('sectionTitle')}</span>
-          </div>
+        <div className="flex flex-col xl:flex-row items-start xl:items-end justify-between gap-6 mb-16">
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            className="flex-shrink-0"
+          >
+            <div className="flex items-center gap-3 mb-6">
+              <div className="h-px w-12 bg-[#5F68A5]" />
+              <span className="text-[#5F68A5] text-sm tracking-[0.2em] uppercase font-medium">{t('sectionTitle')}</span>
+            </div>
 
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#151515] font-bebas leading-[0.95]">
-            {t('title')}
-            <br />
-            <span className="text-[#5F891D]">{t('subtitle')}</span>
-          </h2>
+            <h2 className="text-4xl md:text-4xl lg:text-5xl font-bold text-[#151515] font-bebas leading-[0.95]">
+              {t('title')}{' '}{t('subtitle')} <span className="text-[#5F891D]">2030</span>
+            </h2>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            className="flex justify-start xl:justify-end w-full"
+          >
+            <div className="inline-flex flex-col sm:flex-row bg-white/70 backdrop-blur rounded-2xl sm:rounded-full p-1.5 w-full sm:w-auto border border-[#151515]/10 shadow-sm">
+              {(['2026', '2030'] as const).map((year) => (
+                <button
+                  key={year}
+                  onClick={() => setActiveTab(year)}
+                  className={`
+                    relative px-5 sm:px-8 py-3 rounded-full text-sm font-bold transition-all duration-300 w-full sm:w-auto
+                    ${activeTab === year ? 'text-[#151515]' : 'text-[#151515]/55 hover:text-[#151515]'}
+                  `}
+                >
+                  {activeTab === year && (
+                    <motion.div
+                      layoutId="activeTab"
+                      className="absolute inset-0 bg-[#5F891D]/20 rounded-full border border-[#5F891D]/25"
+                      transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+                    />
+                  )}
+                  <span className="relative z-10">{year === '2026' ? t('year2026') : t('year2030')}</span>
+                </button>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+
+        <motion.div
+          key={activeTab}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="mb-12"
+        >
+          <h3 className="text-2xl md:text-3xl font-bold text-[#151515]/85 font-bebas">
+            {activeTab === '2026' ? t('subtitle2026') : t('subtitle2030')}
+          </h3>
         </motion.div>
 
         <motion.div
-          className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
-          layout
+          key={`grid-${activeTab}`}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+          className={`grid gap-6 ${
+            activeTab === '2026' ? 'md:grid-cols-2 lg:grid-cols-3' : 'md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4'
+          }`}
         >
-          {filteredPriorities.map((priority) => {
+          {priorities.map((priority, index) => {
             const Icon = priority.icon;
-            const prefix = priority.year === '2026' ? 'items2026' : 'items2030';
 
             return (
-              <motion.div
-                key={priority.key}
-                layout
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.3 }}
-              >
-                <div className="group h-full">
-                  <div className={`h-full rounded-2xl border p-6 transition-all duration-300 ${priority.highlight ? 'bg-[#5F891D]/5 border-[#5F891D]/20 hover:bg-[#5F891D]/10' : 'bg-white border-[#151515]/10 hover:border-[#151515]/20'}`}>
-                    <div className="flex items-start justify-between mb-4">
-                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 ${priority.highlight ? 'bg-[#5F891D]/20 text-[#5F891D]' : 'bg-[#5F68A5]/10 text-[#5F68A5]'}`}>
-                        <Icon className="w-6 h-6" />
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="group"
+                >
+                  <div
+                    className={`
+                    relative h-full rounded-2xl p-6 md:p-8 transition-all duration-300 overflow-hidden
+                    ${
+                      priority.highlight
+                        ? 'bg-white border border-[#151515]/10 shadow-lg'
+                        : 'bg-white border border-[#151515]/10 hover:border-[#151515]/20 hover:shadow-xl'
+                    }
+                  `}
+                  >
+                    {priority.highlight && (
+                      <div className="absolute inset-0 bg-gradient-to-br from-[#5F68A5]/10 via-transparent to-[#5F891D]/10" />
+                    )}
+
+                    {priority.metricKey && (
+                      <div className={`absolute top-6 right-6 text-right ${priority.highlight ? 'text-[#5F891D]' : 'text-[#5F68A5]'}`}>
+                        <span className="text-lg md:text-xl font-bold font-bebas">{t(priority.metricKey)}</span>
                       </div>
-                    </div>
+                    )}
 
-                    <h4 className="text-xl md:text-2xl font-bold mb-3 font-bebas tracking-wide max-w-[85%] text-[#151515]">
-                      {t(`${prefix}.${priority.key}.title`)}
-                    </h4>
-                    <p className="leading-relaxed text-[#151515]/65">
-                      {t(`${prefix}.${priority.key}.description`)}
-                    </p>
+                    <div className="relative z-10">
+                      <div
+                        className={`w-14 h-14 rounded-xl flex items-center justify-center mb-6 transition-all duration-300 group-hover:scale-110 ${
+                          priority.highlight ? 'bg-[#5F891D]/20 text-[#5F891D]' : 'bg-[#5F68A5]/10 text-[#5F68A5]'
+                        }`}
+                      >
+                        <Icon className="w-7 h-7" />
+                      </div>
 
-                    <div className={`mt-6 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity ${priority.highlight ? 'text-[#5F891D]' : 'text-[#5F68A5]'}`}>
-                      <span className="text-sm font-medium">{t('focusArea')}</span>
+                      <h4 className="text-xl md:text-2xl font-bold mb-3 font-bebas tracking-wide text-[#151515]">
+                        {t(priority.titleKey)}
+                      </h4>
+                      <p className={`leading-relaxed text-[#151515]/65`}>
+                        {t(priority.descriptionKey)}
+                      </p>
+
+                      <div
+                        className={`mt-6 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity ${
+                          priority.highlight ? 'text-[#5F891D]' : 'text-[#5F68A5]'
+                        }`}
+                      >
+                        <span className="text-sm font-medium">{t('focusArea')}</span>
                       <ArrowRight className="w-4 h-4" />
                     </div>
                   </div>
@@ -111,7 +222,7 @@ export function Priorities() {
         >
           <div className="flex items-center gap-3">
             <div className={`w-3 h-3 rounded-full ${activeTab === '2026' ? 'bg-[#5F68A5]' : 'bg-[#151515]/20'}`} />
-            <span className={`text-sm font-medium ${activeTab === '2026' ? 'text-[#151515]' : 'text-[#151515]/40'}`}>{t('year2026')}</span>
+            <span className={`text-sm font-medium ${activeTab === '2026' ? 'text-[#151515]' : 'text-[#151515]/40'}`}>2026</span>
           </div>
           <div className="w-32 h-1 bg-[#151515]/10 rounded-full overflow-hidden">
             <motion.div
@@ -122,7 +233,7 @@ export function Priorities() {
             />
           </div>
           <div className="flex items-center gap-3">
-            <span className={`text-sm font-medium ${activeTab === '2030' ? 'text-[#151515]' : 'text-[#151515]/40'}`}>{t('year2030')}</span>
+            <span className={`text-sm font-medium ${activeTab === '2030' ? 'text-[#151515]' : 'text-[#151515]/40'}`}>2030</span>
             <div className={`w-3 h-3 rounded-full ${activeTab === '2030' ? 'bg-[#5F891D]' : 'bg-[#151515]/20'}`} />
           </div>
         </motion.div>

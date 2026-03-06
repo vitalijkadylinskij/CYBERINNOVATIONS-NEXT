@@ -45,32 +45,30 @@ export function Footer() {
   return (
     <footer className="bg-[#0f1115] text-[#F3F4E9]">
       {/* CTA Section */}
-      <div className="relative py-16 md:py-24 overflow-hidden">
-        <div className="absolute inset-0">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full bg-[#5F68A5]/10 blur-[120px]" />
-          <div className="absolute bottom-0 right-0 w-[400px] h-[400px] rounded-full bg-[#5F891D]/10 blur-[100px]" />
-        </div>
-
-        <div className="container mx-auto px-4 relative z-10">
+      <div className="relative bg-[#F3F4E9]">
+        <div className="absolute inset-0 bg-gradient-to-r from-[#5F891D]/20 via-transparent to-[#5F68A5]/10 pointer-events-none" />
+        <div className="container mx-auto px-4 py-12 md:py-16">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="max-w-4xl mx-auto text-center"
+            className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8"
           >
-            <h2 className="text-3xl md:text-5xl font-bold font-bebas mb-6 leading-tight">
-              {t('cta.title')}
-            </h2>
-            <p className="text-[#F3F4E9]/60 text-lg mb-8 max-w-2xl mx-auto">
-              {t('cta.description')}
-            </p>
+            <div>
+              <h3 className="text-2xl md:text-3xl font-bold text-[#151515] font-bebas tracking-wide mb-2">
+                {t('cta.title')}
+              </h3>
+              <p className="text-[#151515]/75 max-w-2xl">
+                {t('cta.description')}
+              </p>
+            </div>
             <motion.a
               href="#contact"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="inline-flex items-center gap-2 px-8 py-4 bg-[#5F891D] text-[#151515] font-bold rounded-full hover:bg-[#5F891D]/90 transition-colors"
+              className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-[#5F891D] text-[#151515] font-bold rounded-full hover:bg-[#5F891D]/90 transition-colors shadow-lg w-full sm:w-auto"
             >
-              {t('apply')}
+              <span>{t('apply')}</span>
               <ArrowUpRight className="w-5 h-5" />
             </motion.a>
           </motion.div>
@@ -157,7 +155,7 @@ export function Footer() {
                   {phoneDisplay}
                 </a>
                 <div className="flex items-center gap-3 text-[#F3F4E9]/70 text-sm">
-                  <MapPin className="w-8 h-8" />
+                  <MapPin className="min-w-4 min-h-4" />
                   {t('address')}
                 </div>
               </div>

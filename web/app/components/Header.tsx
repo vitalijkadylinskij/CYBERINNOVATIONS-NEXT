@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, px } from "framer-motion";
 import { Menu, X, ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
@@ -23,9 +23,9 @@ export function Header() {
     { label: t('contacts'), href: "#contact" },
   ];
 
-  const logoSrc = locale === 'en' 
-    ? withBasePath("/logos/Logo-ACI-ENG.ver1.svg")
-    : withBasePath("/logos/Logo-ACI-RUS.ver1.svg");
+  const logoSrc = locale === 'en' ? withBasePath("/logos/Logo-ACI-ENG.ver1.svg") : withBasePath("/logos/Logo-ACI-RUS.ver1.svg");
+
+  const logoWidth = 152;
 
   const handleAnchorClick = (
     event: React.MouseEvent<HTMLAnchorElement>,

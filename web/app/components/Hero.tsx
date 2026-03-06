@@ -42,56 +42,56 @@ const committeeMeta: Record<
     badge: "AI & ML",
     icon: Brain,
     accent: "#5F68A5",
-    image: "materials/media/01.png",
+    image: "materials/media/01.webp",
   },
   blockchain: {
     title: "Распределённые реестры",
     badge: "Blockchain",
     icon: Link,
     accent: "#5F891D",
-    image: "materials/media/02.png",
+    image: "materials/media/02.webp",
   },
   iot: {
     title: "Интернет вещей",
     badge: "IoT",
     icon: Radio,
     accent: "#5F891D",
-    image: "materials/media/03.png",
+    image: "materials/media/03.webp",
   },
   cybersecurity: {
     title: "Кибербезопасность",
     badge: "Cybersecurity",
     icon: Shield,
     accent: "#5F68A5",
-    image: "materials/media/04.png",
+    image: "materials/media/04.webp",
   },
   microelectronics: {
     title: "Микроэлектроника",
     badge: "Robotics",
     icon: Cpu,
     accent: "#5F68A5",
-    image: "materials/media/05.png",
+    image: "materials/media/05.webp",
   },
   cloud: {
     title: "Вычислительная инфраструктура",
     badge: "Cloud",
     icon: Cloud,
     accent: "#5F891D",
-    image: "materials/media/06.png",
+    image: "materials/media/06.webp",
   },
   energy: {
     title: "Энергетическая инфраструктура",
     badge: "Energy",
     icon: Zap,
     accent: "#5F891D",
-    image: "materials/media/07.png",
+    image: "materials/media/07.webp",
   },
   "human-capital": {
     title: "Подготовка кадров",
     badge: "Human Capital",
     icon: Users,
     accent: "#5F68A5",
-    image: "materials/media/08.png",
+    image: "materials/media/08.webp",
   },
 };
 
@@ -113,7 +113,7 @@ export function Hero({ activeCommittee: initialCommittee = 'ai' }: HeroProps) {
     return () => clearInterval(timer);
   }, [activeCommittee]);
 
-  const heroImage = "materials/media/05.png";
+  const heroImage = "materials/media/05.webp";
   const current = committeeMeta[activeCommittee];
   const nextKey = committeeOrder[(committeeOrder.indexOf(activeCommittee) + 1) % committeeOrder.length];
   const next = committeeMeta[nextKey];

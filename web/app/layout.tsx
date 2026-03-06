@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     siteName: "Cyber Innovation",
     images: [
       {
-        url: "https://vitalijkadylinskij.github.io/CYBERINNOVATIONS-NEXT/materials/media/05.png",
+        url: "https://vitalijkadylinskij.github.io/CYBERINNOVATIONS-NEXT/materials/media/05.webp",
         width: 1200,
         height: 630,
       },

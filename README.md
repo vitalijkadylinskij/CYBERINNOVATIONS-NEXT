@@ -4,6 +4,7 @@
 - `nginx` принимает весь внешний трафик и работает как единственная публичная точка входа
 - `web` (Next.js) обслуживает сайт с локалями `/ru` и `/en`
 - `bot-sender` принимает только внутренние запросы от сайта и отправляет заявки в Telegram
+- боевой домен и сертификаты рассчитаны на `adti.by`
 
 ## Архитектура
 
@@ -52,15 +53,14 @@ export TELEGRAM_BOT_TOKEN='ваш_токен'
 curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates" | jq -r '.result[]?.message?.chat?.id' | sort -u
 ```
 
-7. Создайте ключи reCAPTCHA v2 Checkbox и заполните `.env`.
+7. Создайте ключи reCAPTCHA v2 Checkbox для `adti.by` и заполните `.env`.
 
 ## 2. Настройка `.env`
 
 Минимальный пример:
 
 ```dotenv
-SITE_DOMAIN=example.com
-NEXT_PUBLIC_SITE_URL=https://example.com
+NEXT_PUBLIC_SITE_URL=https://adti.by
 NEXT_PUBLIC_BASE_PATH=
 
 INTERNAL_HMAC_SECRET=replace_with_long_random_secret
@@ -73,36 +73,22 @@ ENABLE_DEBUG_ENDPOINTS=false
 ```
 
 Важно:
-- `SITE_DOMAIN` должен совпадать с директорией сертификата в `/etc/letsencrypt/live/<domain>`
-- `NEXT_PUBLIC_SITE_URL` должен быть `https://...`
+- `nginx` в репозитории настроен на `adti.by`
+- на хосте должны существовать сертификаты в `/etc/letsencrypt/live/adti.by/`
+- `NEXT_PUBLIC_SITE_URL` должен быть `https://adti.by`
 - `NEXT_PUBLIC_BASE_PATH` оставляйте пустым, если сайт размещается в корне домена
 
 ## 3. Первый запуск
 
-1. Поднимите compose:
+1. Убедитесь, что сертификат для `adti.by` уже выпущен на хосте.
+
+2. Поднимите compose:
 
 ```bash
 docker compose up -d --build
 ```
 
-Если сертификата ещё нет, `nginx` стартует в bootstrap-режиме:
-- отдаёт `/.well-known/acme-challenge/`
-- отвечает `503` на остальные HTTP-запросы
-- не поднимает HTTPS, пока сертификат не появится
-
-2. Выпустите сертификат на хосте через webroot:
-
-```bash
-sudo certbot certonly --webroot -w /var/www/certbot -d example.com
-```
-
-3. Перезапустите `nginx`, чтобы он перешёл в HTTPS-режим:
-
-```bash
-docker compose up -d --force-recreate nginx
-```
-
-4. Проверьте состояние:
+3. Проверьте состояние:
 
 ```bash
 docker compose ps
@@ -115,7 +101,7 @@ docker compose logs -f --tail=200
 
 ```bash
 sudo certbot renew \
-  --deploy-hook "cd /path/to/CYBERINNOVATIONS-NEXT && docker compose exec -T nginx nginx -s reload -c /tmp/nginx/nginx.conf"
+  --deploy-hook "cd /path/to/CYBERINNOVATIONS-NEXT && docker compose exec -T nginx nginx -s reload"
 ```
 
 Если у вас уже настроен системный timer `certbot`, достаточно один раз добавить такой hook в renewal-конфигурацию или в отдельный script.

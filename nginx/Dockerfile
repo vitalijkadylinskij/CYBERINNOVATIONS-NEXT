@@ -1,11 +1,9 @@
 FROM nginx:1.29-trixie
 
-COPY nginx.bootstrap.conf.template /opt/nginx-templates/nginx.bootstrap.conf.template
-COPY nginx.full.conf.template /opt/nginx-templates/nginx.full.conf.template
-COPY docker-entrypoint.sh /usr/local/bin/custom-nginx-entrypoint.sh
+COPY nginx.conf /etc/nginx/nginx.conf
 
-RUN chmod +x /usr/local/bin/custom-nginx-entrypoint.sh
+RUN rm -f /etc/nginx/conf.d/default.conf
 
-EXPOSE 8080 8443
+EXPOSE 80 443
 
-CMD ["/usr/local/bin/custom-nginx-entrypoint.sh"]
+CMD ["nginx", "-g", "daemon off;"]

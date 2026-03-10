@@ -196,7 +196,7 @@ export function Documents() {
         {/* Документы и шаги */}
         <div className="grid lg:grid-cols-2 gap-12 mb-20">
           {/* Документы */}
-          <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
+          <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="ml-10">
             <h3 className="text-2xl font-bold text-[#151515] font-bebas tracking-wide mb-6">{t('documentsTitle')}</h3>
             <div className="space-y-4 mb-8">
               {documents.map((doc, index) => {
@@ -301,7 +301,7 @@ export function Documents() {
           </motion.div>
 
           {/* Шаги */}
-          <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
+          <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="ml-10">
             <h3 className="text-2xl font-bold text-[#151515] font-bebas tracking-wide mb-6">{t('membershipTitle')}</h3>
             <div className="space-y-6">
               {membershipSteps.map((item, index) => (

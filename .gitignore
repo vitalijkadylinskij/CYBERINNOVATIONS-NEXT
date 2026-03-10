@@ -2,10 +2,21 @@
 .env
 .env.*
 !.env.example
+.envrc
+.direnv/
 .telegram_bot_token
 .internal_hmac_secret
 *.pem
 *.key
+*.crt
+*.cer
+*.csr
+*.p12
+*.pfx
+*.p7b
+*.der
+secrets/
+*.secret
 
 # Dependencies
 node_modules/

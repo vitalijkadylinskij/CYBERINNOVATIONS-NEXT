@@ -11,20 +11,20 @@ services:
       dockerfile: Dockerfile
       args:
         NEXT_PUBLIC_RECAPTCHA_SITE_KEY: ${NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
-        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost}
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:?NEXT_PUBLIC_SITE_URL is required}
         NEXT_PUBLIC_BASE_PATH: ${NEXT_PUBLIC_BASE_PATH:-}
     init: true
     environment:
       NODE_ENV: production
       PORT: 3000
-      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost}
+      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:?NEXT_PUBLIC_SITE_URL is required}
       NEXT_PUBLIC_BASE_PATH: ${NEXT_PUBLIC_BASE_PATH:-}
       BOT_SENDER_URL: http://bot-sender:3001
       RECAPTCHA_SECRET: ${RECAPTCHA_SECRET:?RECAPTCHA_SECRET is required}
       NEXT_PUBLIC_RECAPTCHA_SITE_KEY: ${NEXT_PUBLIC_RECAPTCHA_SITE_KEY:?NEXT_PUBLIC_RECAPTCHA_SITE_KEY is required}
       INTERNAL_HMAC_SECRET: ${INTERNAL_HMAC_SECRET:?INTERNAL_HMAC_SECRET is required}
-    ports:
-      - "${WEB_PORT:-3000}:3000"
+    expose:
+      - "3000"
     networks:
       - public
       - bot-internal
@@ -79,6 +79,42 @@ services:
       timeout: 5s
       retries: 3
       start_period: 15s
+
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    init: true
+    environment:
+      SITE_DOMAIN: ${SITE_DOMAIN:?SITE_DOMAIN is required}
+    ports:
+      - "80:8080"
+      - "443:8443"
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /var/www/certbot:/var/www/certbot:ro
+    networks:
+      - public
+    restart: unless-stopped
+    logging: *logging-default
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/cache/nginx
+      - /var/run
+    healthcheck:
+      test: ["CMD-SHELL", "test -f /tmp/nginx/nginx.conf && nginx -t -c /tmp/nginx/nginx.conf"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    depends_on:
+      web:
+        condition: service_healthy
 
 networks:
   public:

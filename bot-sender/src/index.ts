@@ -19,6 +19,7 @@ const RECIPIENT_USER_IDS = requireEnv('RECIPIENT_USER_IDS')
   .map((value) => value.trim())
   .filter(Boolean);
 const ENABLE_DEBUG_ENDPOINTS = process.env.ENABLE_DEBUG_ENDPOINTS === 'true';
+const ALLOWED_ROLES = new Set(['company', 'government', 'partner', 'media', 'expert', 'volunteer']);
 
 // In-memory LRU cache для idempotency ключей
 const idempotencyKeys = new Map<string, number>();
@@ -47,6 +48,63 @@ function verifySignature(body: string, timestamp: string, signature: string): bo
   const provided = Buffer.from(signature, 'hex');
   if (provided.length !== expected.length) return false;
   return crypto.timingSafeEqual(expected, provided);
+}
+
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function normalizeField(value: string): string {
+  return value.trim().replace(/\s+/g, ' ');
+}
+
+function validateInternalPayload(payload: unknown): { valid: boolean; data?: Record<string, string>; error?: string } {
+  if (!isPlainObject(payload)) {
+    return { valid: false, error: 'Invalid payload' };
+  }
+
+  const allowedFields = new Set(['company', 'name', 'email', 'phone', 'role', 'message']);
+  if (Object.keys(payload).some((field) => !allowedFields.has(field))) {
+    return { valid: false, error: 'Unexpected fields in payload' };
+  }
+
+  const company = typeof payload.company === 'string' ? normalizeField(payload.company) : '';
+  const name = typeof payload.name === 'string' ? normalizeField(payload.name) : '';
+  const email = typeof payload.email === 'string' ? normalizeField(payload.email) : '';
+  const phone = typeof payload.phone === 'string' ? normalizeField(payload.phone) : '';
+  const role = typeof payload.role === 'string' ? normalizeField(payload.role) : '';
+  const message = typeof payload.message === 'string' ? normalizeField(payload.message) : '';
+
+  if (!company || company.length > 100) {
+    return { valid: false, error: 'Invalid company field' };
+  }
+  if (!name || name.length > 100) {
+    return { valid: false, error: 'Invalid name field' };
+  }
+  if (!email || email.length > 254) {
+    return { valid: false, error: 'Invalid email field' };
+  }
+  if (!phone || phone.length > 30) {
+    return { valid: false, error: 'Invalid phone field' };
+  }
+  if (role && !ALLOWED_ROLES.has(role)) {
+    return { valid: false, error: 'Invalid role field' };
+  }
+  if (message.length > 1000) {
+    return { valid: false, error: 'Invalid message field' };
+  }
+
+  return {
+    valid: true,
+    data: {
+      company,
+      name,
+      email,
+      phone,
+      role,
+      message,
+    },
+  };
 }
 
 // Функция отправки сообщения в Telegram с retry
@@ -189,11 +247,12 @@ app.post('/internal/send', async (req, res) => {
   }
 
   // Валидация данных
-  const { company, name, email, phone, role, message } = req.body;
-
-  if (!company || !name || !email || !phone) {
-    return res.status(400).json({ error: 'Missing required fields' });
+  const payloadValidation = validateInternalPayload(req.body);
+  if (!payloadValidation.valid || !payloadValidation.data) {
+    return res.status(400).json({ error: payloadValidation.error || 'Invalid payload' });
   }
+
+  const { company, name, email, phone, role, message } = payloadValidation.data;
 
   // Формирование сообщения
   const telegramMessage = `📝 <b>Новая заявка</b>\n\n` +

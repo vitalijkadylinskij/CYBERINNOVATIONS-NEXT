@@ -11,11 +11,20 @@ function normalizeBasePath(path?: string): string {
   return `/${trimmedPath.replace(/^\/+|\/+$/g, "")}`;
 }
 
+function normalizeSiteUrl(url?: string): string | undefined {
+  if (!url) {
+    return undefined;
+  }
+
+  const trimmedUrl = url.trim().replace(/\/+$/, "");
+  return trimmedUrl || undefined;
+}
+
 export const basePath = normalizeBasePath(process.env.NEXT_PUBLIC_BASE_PATH);
 export const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ||
+  normalizeSiteUrl(process.env.NEXT_PUBLIC_SITE_URL) ||
   (process.env.NODE_ENV === "production"
-    ? "https://vitalijkadylinskij.github.io"
+    ? "https://localhost"
     : "http://localhost:3000");
 
 export function withBasePath(path: string): string {

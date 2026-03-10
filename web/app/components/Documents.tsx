@@ -74,6 +74,7 @@ export function Documents() {
     honeypot: '',
   })
   const [submitted, setSubmitted] = useState(false)
+  const [submittedRole, setSubmittedRole] = useState(getRoleFromSearchParams())
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [formStartTime] = useState(Date.now())
@@ -129,7 +130,7 @@ export function Documents() {
         captchaToken,
       };
   
-      const response = await fetch('/api/submit', {
+      const response = await fetch(withBasePath('/api/submit'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(dataToSend),
@@ -141,8 +142,9 @@ export function Documents() {
         setError(data.error || t('form.error'));
         return;
       }
-  
+
       // Успешная отправка — обновляем UI
+      setSubmittedRole(formData.role);
       setSubmitted(true);
       setFormData({
         company: '',
@@ -362,21 +364,31 @@ export function Documents() {
                     </div>
                     <h4 className="text-2xl font-bold text-[#F3F4E9] mb-2 font-bebas">{t('form.submitted')}</h4>
                     <p className="text-[#F3F4E9]/60 max-w-sm">
-                      {t('form.submittedDescription', { role: t(`form.roles.${formData.role}`) })}
+                      {t('form.submittedDescription', { role: t(`form.roles.${submittedRole}`) })}
                     </p>
                   </motion.div>
                 ) : (
                   <form onSubmit={handleSubmit} className="space-y-4">
-                    <input type="text" style={{ display: 'none' }} value={formData.honeypot} onChange={(e) => setFormData({ ...formData, honeypot: e.target.value })} autoComplete="off" />
-
-                    <div className="grid sm:grid-cols-2 gap-4">
-                      <Input required placeholder={t('form.placeholders.company')} value={formData.company} onChange={(e) => setFormData({ ...formData, company: e.target.value })} className="bg-white/10 border-white/10 text-[#F3F4E9] placeholder:text-[#F3F4E9]/45 focus:border-[#5F891D]" />
-                      <Input required placeholder={t('form.placeholders.name')} value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="bg-white/10 border-white/10 text-[#F3F4E9] placeholder:text-[#F3F4E9]/45 focus:border-[#5F891D]" />
+                    <div className="absolute left-[-9999px] top-auto h-px w-px overflow-hidden" aria-hidden="true">
+                      <label htmlFor="company-website">Website</label>
+                      <input
+                        id="company-website"
+                        type="text"
+                        value={formData.honeypot}
+                        onChange={(e) => setFormData({ ...formData, honeypot: e.target.value })}
+                        autoComplete="off"
+                        tabIndex={-1}
+                      />
                     </div>
 
                     <div className="grid sm:grid-cols-2 gap-4">
-                      <Input required type="email" placeholder={t('form.placeholders.email')} value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="bg-white/10 border-white/10 text-[#F3F4E9] placeholder:text-[#F3F4E9]/45 focus:border-[#5F891D]" />
-                      <Input required type="tel" placeholder={t('form.placeholders.phone')} value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} className="bg-white/10 border-white/10 text-[#F3F4E9] placeholder:text-[#F3F4E9]/45 focus:border-[#5F891D]" />
+                      <Input required maxLength={100} autoComplete="organization" placeholder={t('form.placeholders.company')} value={formData.company} onChange={(e) => setFormData({ ...formData, company: e.target.value })} className="bg-white/10 border-white/10 text-[#F3F4E9] placeholder:text-[#F3F4E9]/45 focus:border-[#5F891D]" />
+                      <Input required maxLength={100} autoComplete="name" placeholder={t('form.placeholders.name')} value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="bg-white/10 border-white/10 text-[#F3F4E9] placeholder:text-[#F3F4E9]/45 focus:border-[#5F891D]" />
+                    </div>
+
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <Input required maxLength={254} autoComplete="email" type="email" placeholder={t('form.placeholders.email')} value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="bg-white/10 border-white/10 text-[#F3F4E9] placeholder:text-[#F3F4E9]/45 focus:border-[#5F891D]" />
+                      <Input required maxLength={30} autoComplete="tel" inputMode="tel" type="tel" placeholder={t('form.placeholders.phone')} value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} className="bg-white/10 border-white/10 text-[#F3F4E9] placeholder:text-[#F3F4E9]/45 focus:border-[#5F891D]" />
                     </div>
 
                     <div>
@@ -387,7 +399,11 @@ export function Documents() {
                       </select>
                     </div>
 
-                    <Textarea placeholder={t('form.placeholders.message')} value={formData.message} onChange={(e) => setFormData({ ...formData, message: e.target.value })} className="bg-white/10 border-white/10 text-[#F3F4E9] placeholder:text-[#F3F4E9]/45 focus:border-[#5F891D]" rows={4} />
+                    <Textarea maxLength={1000} placeholder={t('form.placeholders.message')} value={formData.message} onChange={(e) => setFormData({ ...formData, message: e.target.value })} className="bg-white/10 border-white/10 text-[#F3F4E9] placeholder:text-[#F3F4E9]/45 focus:border-[#5F891D]" rows={4} />
+
+                    <p className="text-xs leading-relaxed text-[#F3F4E9]/60">
+                      {t('form.textOnlyNotice')}
+                    </p>
 
                     {isCaptchaEnabled ? (
                       <div

@@ -1,6 +1,19 @@
 import createNextIntlPlugin from 'next-intl/plugin';
 
 const withNextIntl = createNextIntlPlugin('./lib/i18n.ts');
+const contentSecurityPolicy = [
+  "default-src 'self'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "frame-ancestors 'self'",
+  "object-src 'none'",
+  "script-src 'self' 'unsafe-inline' https://www.google.com https://www.gstatic.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/",
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: https:",
+  "connect-src 'self' https://www.google.com https://www.gstatic.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/",
+  "frame-src 'self' https://www.google.com/recaptcha/ https://recaptcha.google.com/recaptcha/",
+  "font-src 'self' data:",
+].join('; ');
 
 const nextConfig = {
   output: 'standalone',
@@ -16,25 +29,8 @@ const nextConfig = {
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-          {
-            key: 'Content-Security-Policy',
-            value: `
-            default-src 'self';
-            script-src 'self' 'unsafe-inline'
-              https://www.google.com
-              https://www.gstatic.com
-              https://www.google.com/recaptcha/;
-            style-src 'self' 'unsafe-inline';
-            img-src 'self' data:
-              https://www.google.com
-              https://www.gstatic.com;
-            connect-src 'self'
-              https://www.google.com
-              https://www.gstatic.com;
-            frame-src https://www.google.com https://www.gstatic.com;
-            font-src 'self' data:;
-          `.replace(/\n/g, ''),
-          },
+          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+          { key: 'Content-Security-Policy', value: contentSecurityPolicy },
         ],
       },
     ]

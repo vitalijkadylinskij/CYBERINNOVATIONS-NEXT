@@ -511,9 +511,16 @@
       },
       "submit": "Submit",
       "sending": "Sending...",
+      "textOnlyNotice": "This form accepts text data only. File, document, and attachment uploads are not supported.",
       "captchaError": "Please complete CAPTCHA",
       "error": "An error occurred while sending"
     }
+  },
+  "notFound": {
+    "title": "Page Not Found",
+    "description": "The requested URL does not exist or is no longer available.",
+    "home": "Back to Home",
+    "documents": "Open Documents"
   },
   "footer": {
     "cta": {

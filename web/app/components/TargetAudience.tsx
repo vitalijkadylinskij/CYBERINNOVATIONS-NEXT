@@ -80,7 +80,7 @@ function PartnerChip({ name, logo }: Partner) {
           height={100}
           src={logo}
           alt={name}
-          className="max-h-10 md:max-h-12 max-w-[120px] md:max-w-[140px] object-contain opacity-80"
+          className="max-h-10 md:max-h-12 max-w-[120px] md:max-w-[140px] object-cover cover-center opacity-80"
           onError={() => setErrored(true)}
           loading="lazy"
         />

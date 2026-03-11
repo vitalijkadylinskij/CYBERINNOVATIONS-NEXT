@@ -80,7 +80,11 @@ function PartnerChip({ name, logo }: Partner) {
           height={100}
           src={logo}
           alt={name}
-          className="max-h-10 md:max-h-12 max-w-[120px] md:max-w-[140px] object-cover cover-center opacity-80"
+            className={`object-cover opacity-80 ${
+    name === "НЦОД"
+      ? "max-h-14 md:max-h-16 min-w-[160px]"
+      : "max-h-10 md:max-h-12 max-w-[120px] md:max-w-[140px]"
+  }`}
           onError={() => setErrored(true)}
           loading="lazy"
         />
